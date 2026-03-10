@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -697,13 +698,15 @@ window.doConfirmClose = async () => {
   try {
     const now = new Date();
     const t = calcTotals(entries);
-    await setDoc(doc(db,'history',session.dateKey||now.toISOString().slice(0,10)),{
+    const histId = (session.dateKey||now.toISOString().slice(0,10)) + '_' + now.getTime();
+    await setDoc(doc(db,'history', histId),{
       date:session.date, dateKey:session.dateKey||now.toISOString().slice(0,10),
       startTime:session.startTime, closedAt:now.toISOString(),
       entries:entries.map(e=>({lr:e.lr,name:e.name,mobile:e.mobile,vehicle:e.vehicle,
         amount:e.amount,payType:e.payType,time:e.time,item:e.item||'',bookedBy:e.bookedBy||'',note:e.note||''})),
       paidAmt:t.paidAmt,topayAmt:t.topayAmt,gross:t.gross,commission:t.commission,net:t.net,
-      cashBalance:t.cashBalance, count:entries.length, savedAt:now.getTime()
+      cashBalance:t.cashBalance, count:entries.length, savedAt:now.getTime(),
+      histId: histId
     });
     for(const e of entries) await deleteDoc(doc(db,'session','today','entries',e._id));
     await setDoc(doc(db,'session','today'),{active:false,closedAt:now.toISOString()});
@@ -1117,14 +1120,13 @@ window.histDeleteEntry = async idx => {
 
 async function saveHistToFirestore(newEnts){
   const t = calcTotals(newEnts);
-  const dateKey = currentHistSession.dateKey;
+  const docId = currentHistSession.histId || currentHistSession.dateKey;
   const updated = {...currentHistSession, entries:newEnts, count:newEnts.length,
     paidAmt:t.paidAmt, topayAmt:t.topayAmt, gross:t.gross,
     commission:t.commission, net:t.net, cashBalance:t.cashBalance};
-  await setDoc(doc(db,'history',dateKey), updated);
+  await setDoc(doc(db,'history', docId), updated);
   currentHistSession = updated;
-  // Update in local list too
-  const li = histSessions.findIndex(s=>s.dateKey===dateKey);
+  const li = histSessions.findIndex(s=>(s.histId||s.dateKey)===(updated.histId||updated.dateKey));
   if(li>=0) histSessions[li] = updated;
   refreshHistDetail();
   renderHistList();
