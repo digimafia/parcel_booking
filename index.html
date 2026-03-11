@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANS Travels – Parcel Booking</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4f8;--surface:#fff;--border:#dde3ec;
+  --accent:#1a56db;--green:#0e9f6e;--red:#e02424;--orange:#d97706;
+  --text:#1a2035;--muted:#6b7a99;--light:#e8edf5;
+  --shadow:0 2px 8px rgba(26,32,53,0.08);--shadow-md:0 4px 20px rgba(26,32,53,0.14);
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* LANDING */
+#landingScreen{position:fixed;inset:0;background:linear-gradient(145deg,#0e3fa3 0%,#1a56db 55%,#1e66f5 100%);z-index:900;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.land-logo{text-align:center;margin-bottom:40px}
+.land-truck{font-size:3.8rem;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.3))}
+.land-title{font-family:'Playfair Display',serif;font-size:1.9rem;color:#fff;margin-top:10px;text-shadow:0 2px 10px rgba(0,0,0,0.25)}
+.land-sub{font-size:0.78rem;color:rgba(255,255,255,0.72);margin-top:5px;letter-spacing:1.2px;text-transform:uppercase}
+.land-btns{display:flex;flex-direction:column;gap:14px;width:100%;max-width:310px}
+.land-btn{padding:17px 20px;border-radius:14px;border:none;font-family:'Poppins',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:0.2px}
+.land-btn:active{transform:scale(0.97)}
+.land-btn-book{background:#fff;color:var(--accent);box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+.land-btn-book:hover{background:#f0f6ff}
+.land-btn-admin{background:rgba(255,255,255,0.14);color:#fff;border:2px solid rgba(255,255,255,0.4)}
+.land-btn-admin:hover{background:rgba(255,255,255,0.24)}
+.land-ver{position:absolute;bottom:16px;font-size:0.67rem;color:rgba(255,255,255,0.35)}
+
+/* ADMIN LOGIN */
+#adminLoginScreen{position:fixed;inset:0;background:linear-gradient(135deg,#1a56db,#0e3fa3);z-index:910;display:none;align-items:center;justify-content:center;padding:20px}
+.abox{background:#fff;border-radius:20px;padding:32px 26px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.25)}
+.abox-hd{text-align:center;margin-bottom:22px}
+.abox-hd .ico{font-size:2.4rem}
+.abox-hd h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--accent);margin-top:7px}
+.abox-hd p{font-size:0.73rem;color:var(--muted);margin-top:2px}
+.lbl{display:block;font-size:0.69rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px}
+.lin{width:100%;border:1.5px solid var(--border);background:#f8fafc;color:var(--text);border-radius:8px;padding:10px 13px;font-size:0.9rem;font-family:'Poppins',sans-serif;transition:border-color 0.2s}
+.lin:focus{outline:none;border-color:var(--accent);background:#fff}
+.btn-login{width:100%;padding:12px;background:linear-gradient(135deg,#1a56db,#0e3fa3);color:#fff;border:none;border-radius:10px;font-family:'Poppins',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;margin-top:6px}
+.login-err{color:var(--red);font-size:0.77rem;margin-top:8px;text-align:center;display:none;padding:7px;background:#fef2f2;border-radius:6px;border:1px solid #fecaca}
+.btn-back-login{width:100%;padding:9px;background:#f8fafc;border:1px solid var(--border);color:var(--muted);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.83rem;cursor:pointer;margin-top:8px}
+
+/* HEADER */
+.header{background:#fff;border-bottom:2px solid var(--accent);padding:0 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;height:52px;box-shadow:var(--shadow)}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.hdr-logo{font-size:1.3rem}
+.hdr-title{font-family:'Playfair Display',serif;font-size:0.98rem;color:var(--accent);line-height:1.1}
+.hdr-title small{display:block;font-family:'Poppins',sans-serif;font-size:0.59rem;color:var(--muted);font-style:normal}
+.hdr-right{display:flex;align-items:center;gap:5px}
+.live-chip{display:flex;align-items:center;gap:3px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:20px;padding:3px 7px;font-size:0.63rem;font-weight:700;color:var(--green);white-space:nowrap}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.4)}}
+.online-chip{background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:3px 8px;font-size:0.63rem;font-weight:700;color:var(--accent);white-space:nowrap}
+.user-badge{background:var(--light);border:1px solid var(--border);border-radius:20px;padding:3px 9px;font-size:0.66rem;font-weight:600;color:var(--text);white-space:nowrap}
+.user-badge.admin-badge{background:#eff6ff;border-color:#bfdbfe;color:var(--accent)}
+.btn-hdr{background:none;border:1px solid var(--border);border-radius:7px;padding:4px 9px;font-size:0.68rem;color:var(--muted);cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap}
+.btn-hdr:hover{border-color:var(--red);color:var(--red)}
+
+/* NAV */
+.nav-tabs{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0 12px;box-shadow:var(--shadow)}
+.nav-tab{padding:11px 16px;font-size:0.79rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:'Poppins',sans-serif}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* PAGES */
+.main{max-width:630px;margin:0 auto;padding:14px}
+.page{display:none}.page.active{display:block}
+
+/* SESSION BAR */
+.session-bar{display:flex;gap:10px;margin-bottom:12px}
+.btn-sess{padding:10px 16px;border:none;border-radius:var(--radius);font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-sess:active{transform:scale(0.97)}
+.btn-start{background:var(--green);color:#fff}
+.btn-start:disabled{background:#d1fae5;color:#6ee7b7;cursor:not-allowed}
+.btn-close-sess{background:var(--red);color:#fff}
+.btn-close-sess:disabled{background:#fee2e2;color:#fca5a5;cursor:not-allowed}
+.info-strip{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:9px 14px;margin-bottom:12px;font-size:0.76rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;box-shadow:var(--shadow)}
+.info-strip .val{color:var(--text);font-weight:600}
+.no-session{text-align:center;padding:30px 20px;color:var(--muted);font-size:0.8rem;background:#fff;border-radius:var(--radius);border:1px solid var(--border)}
+.no-session .big{font-size:2.4rem;margin-bottom:8px}
+.no-session strong{color:var(--text);display:block;margin-bottom:4px;font-size:0.93rem}
+
+/* FORM */
+.form-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.form-ttl{font-size:0.8rem;font-weight:700;color:var(--accent);margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.form-row{margin-bottom:10px}
+.form-lbl{display:block;font-size:0.69rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px}
+input,select,textarea{width:100%;background:#f8fafc;border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:9px 11px;font-size:0.88rem;font-family:'Poppins',sans-serif;transition:border-color 0.2s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);background:#fff}
+input::placeholder,textarea::placeholder{color:#aab4c8}
+textarea{resize:vertical;min-height:58px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lr-col{display:grid;grid-template-columns:110px 1fr;gap:10px}
+.pay-toggle{display:flex;gap:8px}
+.pay-opt{flex:1;padding:8px;border:2px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;font-weight:600;font-size:0.82rem;transition:all 0.2s;background:#f8fafc;color:var(--muted);user-select:none}
+.pay-opt.sel-paid{border-color:var(--green);color:var(--green);background:#f0fdf4}
+.pay-opt.sel-topay{border-color:#f97316;color:#f97316;background:#fff7ed}
+.bookedby-wrap{display:flex;gap:6px;align-items:center}
+.bookedby-wrap select{flex:1}
+.btn-mgr{padding:8px 11px;background:#eff6ff;border:1.5px solid #bfdbfe;color:var(--accent);border-radius:8px;font-size:0.7rem;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Poppins',sans-serif;flex-shrink:0}
+.btn-add{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#0e3fa3);color:#fff;border:none;border-radius:var(--radius);font-family:'Poppins',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;margin-top:4px}
+.btn-add.upd{background:linear-gradient(135deg,#0891b2,#0369a1)}
+.btn-add:disabled{opacity:0.55;cursor:not-allowed}
+.btn-cancel-edit{width:100%;padding:8px;background:#f8fafc;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);font-family:'Poppins',sans-serif;font-size:0.82rem;cursor:pointer;margin-top:5px}
+
+/* BOTTOM BTNS */
+.bot-btns{margin-bottom:14px;display:flex;flex-direction:column;gap:8px}
+.btn-outline{width:100%;padding:11px;background:#fff;border:1.5px solid var(--accent);color:var(--accent);border-radius:var(--radius);font-family:'Poppins',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-outline:hover{background:#eff6ff}
+.btn-wa-big{width:100%;padding:11px;background:#25d366;border:none;color:#fff;border-radius:var(--radius);font-family:'Poppins',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* ENTRIES TABLE */
+.ent-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow)}
+.ent-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#f8fafc,#eff6ff)}
+.ent-ttl{font-size:0.86rem;font-weight:700;color:var(--text)}
+.cnt-chip{background:var(--accent);color:#fff;font-size:0.7rem;font-weight:700;padding:2px 9px;border-radius:20px}
+.filt-bar{display:flex;gap:6px;padding:8px 12px;background:#f8fafc;border-bottom:1px solid var(--border);overflow-x:auto}
+.fbtn{padding:4px 11px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--muted);font-family:'Poppins',sans-serif;font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.fbtn.fa{border-color:var(--accent);color:var(--accent);background:#eff6ff}
+.fbtn.fp{border-color:var(--green);color:var(--green);background:#f0fdf4}
+.fbtn.ft{border-color:#f97316;color:#f97316;background:#fff7ed}
+.ent-wrap{overflow-x:auto}
+table.etbl{width:100%;border-collapse:collapse;font-size:0.74rem;min-width:480px}
+table.etbl thead tr{background:#f8fafc}
+table.etbl th{padding:7px 8px;text-align:left;font-size:0.62rem;color:var(--muted);text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
+table.etbl td{padding:7px 8px;border-bottom:1px solid #f0f4f8;color:var(--text);vertical-align:middle}
+table.etbl tr:last-child td{border-bottom:none}
+table.etbl tr:hover{background:#fafbff}
+.td-lr{font-weight:700;font-size:0.75rem;color:var(--accent)}
+.td-nm{font-weight:600;font-size:0.78rem}
+.td-sb{font-size:0.64rem;color:var(--muted);margin-top:1px}
+.tag{padding:2px 7px;border-radius:20px;font-size:0.62rem;font-weight:600;white-space:nowrap}
+.tg-p{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+.tg-t{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.act-btns{display:flex;gap:4px}
+.act-btn{border:1px solid var(--border);background:#fff;font-size:0.67rem;padding:3px 7px;border-radius:6px;cursor:pointer;transition:all 0.2s;font-family:'Poppins',sans-serif;color:var(--muted)}
+.act-btn.edit:hover{border-color:#0891b2;color:#0891b2;background:#ecfeff}
+.act-btn.del:hover{border-color:var(--red);color:var(--red);background:#fef2f2}
+.empty-st{padding:28px;text-align:center;color:var(--muted);font-size:0.78rem}
+
+/* MODALS */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,20,40,0.55);z-index:500;padding:16px;overflow-y:auto;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.mbox{background:#fff;border-radius:14px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.18);overflow:hidden;max-height:92vh;overflow-y:auto}
+.mhd{padding:13px 17px;border-bottom:1px solid var(--border);font-size:0.88rem;font-weight:700;color:var(--text);position:sticky;top:0;background:#fff;z-index:1}
+.mbody{padding:16px}
+.mfoot{padding:11px 17px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.btn-mc{padding:9px 17px;background:#f8fafc;border:1px solid var(--border);color:var(--muted);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer}
+.btn-mok{padding:9px 19px;background:var(--green);border:none;color:#fff;border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer}
+.btn-mdng{padding:9px 19px;background:var(--red);border:none;color:#fff;border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer}
+
+/* Preview grid */
+.pvgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.pf{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:9px 12px}
+.pf-l{font-size:0.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;font-weight:600}
+.pf-v{font-size:0.87rem;font-weight:700;color:var(--text)}
+.pf-v.blue{color:var(--accent)}.pf-v.green{color:var(--green)}.pf-v.orange{color:#f97316}
+.pf.full{grid-column:1/-1}
+/* After-preview buttons */
+.pv-acts{display:flex;gap:8px;margin:12px 0 4px}
+.btn-wa-cust{flex:1;padding:10px 8px;background:#25d366;border:none;color:#fff;border-radius:10px;font-family:'Poppins',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+.btn-rcpt{flex:1;padding:10px 8px;background:#fff;border:1.5px solid var(--accent);color:var(--accent);border-radius:10px;font-family:'Poppins',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+
+/* Booked By manager */
+.by-list{max-height:190px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:12px}
+.by-item{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #f0f4f8;font-size:0.83rem}
+.by-item:last-child{border-bottom:none}
+.by-nm{font-weight:600}
+.by-acts{display:flex;gap:5px}
+
+/* REPORT OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,20,40,0.6);z-index:200;overflow-y:auto;padding:16px}
+.overlay.show{display:flex;align-items:flex-start;justify-content:center}
+.rpt-box{background:#fff;border-radius:16px;width:100%;max-width:640px;overflow:hidden;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,0.22)}
+.rpt-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;background:#f8fafc;border-bottom:1px solid var(--border);gap:6px;flex-wrap:wrap}
+.btn-bk{background:#fff;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 13px;font-family:'Poppins',sans-serif;font-size:0.76rem;font-weight:600;cursor:pointer}
+.btn-bk:hover{border-color:var(--accent);color:var(--accent)}
+.rpt-acts{display:flex;gap:5px;flex-wrap:wrap}
+.btn-rsm{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 11px;font-family:'Poppins',sans-serif;font-size:0.74rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn-rwa{background:#25d366;border:none;color:#fff;border-radius:8px;padding:6px 11px;font-family:'Poppins',sans-serif;font-size:0.74rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn-rcon{background:var(--green);border:none;color:#fff;border-radius:8px;padding:6px 13px;font-family:'Poppins',sans-serif;font-size:0.74rem;font-weight:600;cursor:pointer}
+.rpt-hdr{background:linear-gradient(135deg,#1a56db,#0e3fa3);padding:19px 22px;color:#fff}
+.rpt-hdr-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.rpt-co{font-family:'Playfair Display',serif;font-size:1.2rem}
+.rpt-co small{display:block;font-family:'Poppins',sans-serif;font-size:0.66rem;opacity:0.75;margin-top:2px;font-style:normal}
+.rpt-badge{background:rgba(255,255,255,0.2);border-radius:8px;padding:6px 11px;text-align:right;font-size:0.69rem;line-height:1.4}
+.rpt-meta{display:flex;gap:13px;flex-wrap:wrap;font-size:0.71rem;opacity:0.85}
+.rpt-body{padding:14px}
+.rpt-lbl{font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.r-twrap{overflow-x:auto;margin-bottom:13px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+table.rtbl{width:100%;border-collapse:collapse;font-size:0.72rem;min-width:400px}
+table.rtbl thead tr{background:#f8fafc}
+table.rtbl th{padding:7px 8px;text-align:left;font-size:0.61rem;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600}
+table.rtbl td{padding:7px 8px;border-bottom:1px solid #f0f4f8;vertical-align:top}
+table.rtbl tr:last-child td{border-bottom:none}
+table.rtbl tr:nth-child(even){background:#fafbff}
+.r-lr{font-weight:700;color:var(--accent);font-size:0.74rem}
+.r-nm{font-weight:600;font-size:0.74rem}
+.r-sb{color:var(--muted);font-size:0.62rem}
+.r-am{font-weight:700;font-size:0.82rem}
+.summ-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sc{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:11px 13px}
+.sl{font-size:0.64rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+.sv{font-size:1.06rem;font-weight:700}
+.sv.green{color:var(--green)}.sv.orange{color:#d97706}
+.calc-blk{background:#f8fafc;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.cr{display:flex;justify-content:space-between;align-items:center;padding:9px 13px;border-bottom:1px solid var(--border)}
+.cr:last-child{border-bottom:none}
+.cr .cl{font-size:0.76rem;color:var(--muted)}
+.cr .cv{font-weight:700;font-size:0.86rem;color:var(--text)}
+.cr.hl-b{background:#eff6ff}.cr.hl-b .cl{color:var(--accent);font-weight:600}.cr.hl-b .cv{color:var(--accent);font-size:0.94rem}
+.cr.hl-r .cl{color:var(--red)}.cr.hl-r .cv{color:var(--red)}
+.cr.hl-g{background:#f0fdf4}.cr.hl-g .cl{color:var(--green);font-weight:700}.cr.hl-g .cv{color:var(--green);font-size:1.01rem}
+.cr.hl-p{background:#f5f3ff}.cr.hl-p .cl{color:#7c3aed;font-weight:600}.cr.hl-p .cv{color:#7c3aed}
+.dvl{height:1px;background:var(--border);margin:2px 0}
+
+/* HISTORY */
+.hist-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:9px;transition:all 0.2s}
+.hist-card:hover{box-shadow:var(--shadow-md);border-color:#bfdbfe}
+.hist-inner{padding:12px 14px;display:flex;align-items:center;gap:10px}
+.hist-l{flex:1;min-width:0;cursor:pointer}
+.hist-dt{font-size:0.84rem;font-weight:700;color:var(--text)}
+.hist-mt{font-size:0.69rem;color:var(--muted);margin-top:2px}
+.hist-r{text-align:right;flex-shrink:0;cursor:pointer}
+.hist-net{font-size:0.96rem;font-weight:700;color:var(--green)}
+.hist-chv{color:var(--muted);font-size:0.86rem;margin-left:4px}
+.hist-del{border:1px solid #fee2e2;background:#fff;color:#fca5a5;border-radius:7px;padding:5px 9px;font-size:0.7rem;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s;flex-shrink:0}
+.hist-del:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.hist-empty{text-align:center;padding:38px 20px;color:var(--muted);background:#fff;border-radius:var(--radius);border:1px solid var(--border)}
+.hist-det-overlay{display:none;position:fixed;inset:0;background:rgba(15,20,40,0.6);z-index:300;overflow-y:auto;padding:16px}
+.hist-det-overlay.show{display:flex;align-items:flex-start;justify-content:center}
+.admin-bar{display:none;padding:8px 16px;background:#fff7ed;border-bottom:1px solid #fed7aa;font-size:0.73rem;color:#92400e;align-items:center;gap:8px}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);border-radius:24px;padding:9px 18px;font-size:0.78rem;font-weight:600;color:#fff;z-index:999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:var(--shadow-md)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green)}.toast.error{background:var(--red)}
+
+@media(max-width:430px){.two-col,.lr-col,.pvgrid,.summ-grid{grid-template-columns:1fr 1fr}.pv-acts{flex-direction:column}}
+
+/* PRINT */
+@media print{html,body{margin:0!important;padding:0!important;background:#fff!important}body>*{display:none!important}#printArea{display:block!important;margin:0;padding:0}}
+#printArea{display:none}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landingScreen">
+  <div class="land-logo">
+    <div class="land-truck">🚚</div>
+    <div class="land-title">ANS Travels</div>
+    <div class="land-sub">Parcel Booking System</div>
+  </div>
+  <div class="land-btns">
+    <button class="land-btn land-btn-book" onclick="startAsStaff()">📦 Start Booking</button>
+    <button class="land-btn land-btn-admin" onclick="showAdminLogin()">👑 Admin Panel</button>
+  </div>
+  <div class="land-ver">ANS Travels v3.1</div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLoginScreen">
+  <div class="abox">
+    <div class="abox-hd">
+      <div class="ico">👑</div>
+      <h2>Admin Login</h2>
+      <p>Enter admin credentials to continue</p>
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="lbl">Username</label>
+      <input class="lin" type="text" id="adminUser" placeholder="Username" autocomplete="off" autocapitalize="none">
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="lbl">Password</label>
+      <input class="lin" type="password" id="adminPass" placeholder="Password" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <button class="btn-login" onclick="doAdminLogin()">Login as Admin →</button>
+    <div class="login-err" id="adminLoginErr">Invalid username or password</div>
+    <button class="btn-back-login" onclick="backToLanding()">← Back to Home</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header" id="appHeader" style="display:none">
+  <div class="hdr-left">
+    <span class="hdr-logo">🚚</span>
+    <div class="hdr-title">ANS Travels<small>Parcel Booking App</small></div>
+  </div>
+  <div class="hdr-right">
+    <div class="live-chip"><div class="live-dot"></div>LIVE</div>
+    <div class="online-chip" id="onlineChip">👥 1</div>
+    <div class="user-badge" id="userBadge">Staff</div>
+    <button class="btn-hdr" id="btnExit" onclick="handleExit()">← Exit</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-tabs" id="navTabs" style="display:none">
+  <button class="nav-tab active" id="tabBooking" onclick="switchTab('booking')">📦 Booking</button>
+  <button class="nav-tab"        id="tabHistory" onclick="switchTab('history')">📊 Reports</button>
+</div>
+
+<!-- BOOKING PAGE -->
+<div class="page active" id="pageBooking">
+  <div class="main">
+
+    <div class="session-bar">
+      <button class="btn-sess btn-start"      id="btnStart"    onclick="startSession()">▶ Start Today</button>
+      <button class="btn-sess btn-close-sess" id="btnCloseSess" onclick="closeSession()" disabled>■ Close Account</button>
+    </div>
+
+    <div class="info-strip" id="infoStrip" style="display:none">
+      <span>📅 <span class="val" id="infoDate">–</span></span>
+      <span>📦 <span class="val" id="infoCount">0</span> entries</span>
+      <span>💰 Total: ₹<span class="val" id="infoTotal">0.00</span></span>
+    </div>
+
+    <div class="no-session" id="noSessMsg">
+      <div class="big">📦</div>
+      <strong>No Active Session</strong>
+      Press "Start Today" to begin booking entries
+    </div>
+
+    <!-- FORM -->
+    <div class="form-card" id="formCard" style="display:none">
+      <div class="form-ttl" id="formTitle">✏️ New Entry</div>
+      <div class="lr-col">
+        <div class="form-row">
+          <label class="form-lbl">LR No.</label>
+          <input type="text" id="fLR" placeholder="LR001" style="text-transform:uppercase">
+        </div>
+        <div class="form-row">
+          <label class="form-lbl">Sender Name</label>
+          <input type="text" id="fName" placeholder="Full name" autocomplete="off">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label class="form-lbl">Mobile No.</label>
+          <input type="tel" id="fMobile" placeholder="10-digit" maxlength="10">
+        </div>
+        <div class="form-row">
+          <label class="form-lbl">Vehicle No.</label>
+          <input type="text" id="fVehicle" placeholder="TN01AB1234" style="text-transform:uppercase">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label class="form-lbl">Item Details</label>
+          <select id="fItem">
+            <option value="">Select item…</option>
+            <option>Electronics</option><option>Clothing / Textile</option><option>Documents</option>
+            <option>Furniture</option><option>Auto Parts</option><option>Grocery / Food</option>
+            <option>Medicine / Medical</option><option>Machinery</option><option>Bags / Luggage</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-lbl">Booked By</label>
+          <div class="bookedby-wrap">
+            <select id="fBookedBy"></select>
+            <button class="btn-mgr" onclick="openManageBookedBy()" title="Manage names">⚙️</button>
+          </div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label class="form-lbl">Amount (₹)</label>
+          <input type="number" id="fAmount" placeholder="0.00" min="0">
+        </div>
+        <div class="form-row">
+          <label class="form-lbl">Payment Type</label>
+          <div class="pay-toggle">
+            <div class="pay-opt sel-paid" id="optPaid"  onclick="selPay('Paid')">✅ Paid</div>
+            <div class="pay-opt"          id="optTopay" onclick="selPay('ToPay')">⏳ ToPay</div>
+          </div>
+          <input type="hidden" id="fPayType" value="Paid">
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">Note</label>
+        <textarea id="fNote" placeholder="Any special instructions…" rows="2"></textarea>
+      </div>
+      <input type="hidden" id="fEditId" value="">
+      <button class="btn-add" id="btnAdd" onclick="previewEntry()">👁 Review &amp; Add Entry</button>
+      <button class="btn-cancel-edit" id="btnCancelEdit" onclick="cancelEdit()" style="display:none">✕ Cancel Edit</button>
+    </div>
+
+    <!-- ENTRIES LIST -->
+    <div class="ent-card" id="entriesCard" style="display:none">
+      <div class="ent-hdr">
+        <div class="ent-ttl">Today's Entries</div>
+        <span class="cnt-chip" id="entryCount">0</span>
+      </div>
+      <div class="filt-bar">
+        <button class="fbtn fa" id="fAll"   onclick="setFilter('all')">All</button>
+        <button class="fbtn"    id="fPaid"  onclick="setFilter('paid')">✅ Paid</button>
+        <button class="fbtn"    id="fTopay" onclick="setFilter('topay')">⏳ To Pay</button>
+      </div>
+      <div class="ent-wrap"><div id="entriesList"></div></div>
+    </div>
+
+    <!-- BOTTOM ACTIONS -->
+    <div class="bot-btns" id="bottomBtns" style="display:none">
+      <button class="btn-outline"  onclick="printCurrentSummary()">🖨 Print Summary Report</button>
+      <button class="btn-wa-big"   onclick="sendWA('current')">📲 Send Report to WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div class="page" id="pageHistory">
+  <div class="main">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:0.92rem;font-weight:700;color:var(--text)">📊 Last 30 Sessions</div>
+      <span style="font-size:0.69rem;color:var(--muted)">Tap a session to view</span>
+    </div>
+    <div id="histList"><div class="hist-empty"><div style="font-size:1.8rem;margin-bottom:8px">⏳</div>Loading…</div></div>
+  </div>
+</div>
+
+<!-- ════ MODALS ════ -->
+
+<!-- Entry Preview Modal -->
+<div class="modal-bg" id="previewModal">
+  <div class="mbox">
+    <div class="mhd">👁 Confirm Entry Details</div>
+    <div class="mbody">
+      <div class="pvgrid" id="pvGrid"></div>
+      <p style="font-size:0.72rem;color:var(--muted);text-align:center;margin-bottom:10px">Please verify all details before saving.</p>
+      <div class="pv-acts">
+        <button class="btn-wa-cust" onclick="sendToCustomerWA()">📲 WhatsApp to Customer</button>
+        <button class="btn-rcpt"    onclick="printReceipt()">🧾 Print Receipt</button>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn-mc"  onclick="closeModal('previewModal')">✏️ Edit</button>
+      <button class="btn-mok" onclick="submitEntry()">✅ Confirm &amp; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Close Modal -->
+<div class="modal-bg" id="confirmCloseModal">
+  <div class="mbox" style="max-width:400px">
+    <div class="mhd">⚠️ Close Account Confirmation</div>
+    <div class="mbody">
+      <p style="font-size:0.84rem;line-height:1.6;margin-bottom:10px">You are about to <strong>close today's session</strong>. This will:</p>
+      <ul style="font-size:0.8rem;color:var(--muted);line-height:1.9;padding-left:16px;margin-bottom:10px">
+        <li>Save all entries to the report archive</li>
+        <li>Clear today's active session</li>
+        <li>This action <strong style="color:var(--red)">cannot be undone</strong></li>
+      </ul>
+      <p style="font-size:0.8rem;color:var(--muted)">Are you sure you want to proceed?</p>
+    </div>
+    <div class="mfoot">
+      <button class="btn-mc"  onclick="closeModal('confirmCloseModal')">Cancel</button>
+      <button class="btn-mdng" onclick="doConfirmClose()">Yes, Close Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Booked By Modal -->
+<div class="modal-bg" id="manageByModal">
+  <div class="mbox" style="max-width:380px">
+    <div class="mhd">⚙️ Manage Booked By Names</div>
+    <div class="mbody">
+      <div class="by-list" id="byList"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="newByName" placeholder="Enter new name…" style="flex:1">
+        <button class="btn-mok" style="padding:9px 13px;white-space:nowrap" onclick="addByName()">+ Add</button>
+      </div>
+    </div>
+    <div class="mfoot"><button class="btn-mc" onclick="closeModal('manageByModal')">Close</button></div>
+  </div>
+</div>
+
+<!-- Edit Booked By Name Modal -->
+<div class="modal-bg" id="editByModal">
+  <div class="mbox" style="max-width:320px">
+    <div class="mhd">✏️ Edit Name</div>
+    <div class="mbody">
+      <input type="text" id="editByInput">
+      <input type="hidden" id="editByIdx">
+    </div>
+    <div class="mfoot">
+      <button class="btn-mc"  onclick="closeModal('editByModal')">Cancel</button>
+      <button class="btn-mok" onclick="saveEditBy()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- SESSION REPORT OVERLAY -->
+<div class="overlay" id="reportOverlay">
+  <div class="rpt-box">
+    <div class="rpt-topbar">
+      <button class="btn-bk" onclick="closeReport()">← Back &amp; Check</button>
+      <div class="rpt-acts">
+        <button class="btn-rwa"  onclick="sendWA('current')">📲 WhatsApp</button>
+        <button class="btn-rsm"  onclick="printReport()">🖨 Print</button>
+        <button class="btn-rcon" id="btnConfirm" onclick="openConfirmCloseModal()">✔ Close</button>
+      </div>
+    </div>
+    <div class="rpt-hdr">
+      <div class="rpt-hdr-top">
+        <div><div class="rpt-co">ANS Travels<small>Parcel Booking – Daily Report</small></div></div>
+        <div class="rpt-badge" id="rptBadge">–</div>
+      </div>
+      <div class="rpt-meta" id="rptMeta"></div>
+    </div>
+    <div class="rpt-body">
+      <div class="rpt-lbl">Entry Details</div>
+      <div class="r-twrap">
+        <table class="rtbl"><thead><tr><th>#</th><th>LR</th><th>Name/Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type</th><th style="text-align:right">Amount</th></tr></thead>
+        <tbody id="rptBody"></tbody></table>
+      </div>
+      <div class="summ-grid" id="rptSumm"></div>
+      <div class="rpt-lbl">Calculation</div>
+      <div class="calc-blk" id="rptCalc"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY DETAIL OVERLAY -->
+<div class="hist-det-overlay" id="histDetOverlay">
+  <div class="rpt-box">
+    <div class="rpt-topbar">
+      <button class="btn-bk" onclick="closeHistDet()">← Back</button>
+      <div class="rpt-acts">
+        <button class="btn-rwa" onclick="sendWA('hist')">📲 WhatsApp</button>
+        <button class="btn-rsm" onclick="printHistDet()">🖨 Print</button>
+      </div>
+    </div>
+    <div class="rpt-hdr">
+      <div class="rpt-hdr-top">
+        <div><div class="rpt-co">ANS Travels<small>Parcel Booking – Session Report</small></div></div>
+        <div class="rpt-badge" id="histBadge">–</div>
+      </div>
+      <div class="rpt-meta" id="histMeta"></div>
+    </div>
+    <div class="admin-bar" id="adminBar">
+      <span>👑 Admin Mode — tap ✏️ / ✕ on any row to edit or delete</span>
+    </div>
+    <div class="rpt-body">
+      <div class="rpt-lbl">Entry Details</div>
+      <div class="r-twrap">
+        <table class="rtbl"><thead><tr><th>#</th><th>LR</th><th>Name/Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type</th><th style="text-align:right">Amount</th><th id="actTh" style="display:none">Act</th></tr></thead>
+        <tbody id="histDetBody"></tbody></table>
+      </div>
+      <div class="summ-grid" id="histSumm"></div>
+      <div class="rpt-lbl">Calculation</div>
+      <div class="calc-blk"  id="histCalc"></div>
+    </div>
+  </div>
+</div>
+
+<!-- History Entry Edit Modal -->
+<div class="modal-bg" id="histEditModal">
+  <div class="mbox">
+    <div class="mhd">✏️ Edit History Entry</div>
+    <div class="mbody">
+      <div class="lr-col" style="margin-bottom:10px">
+        <div><label class="form-lbl">LR No.</label><input type="text" id="heLR" style="text-transform:uppercase"></div>
+        <div><label class="form-lbl">Sender Name</label><input type="text" id="heName"></div>
+      </div>
+      <div class="two-col" style="margin-bottom:10px">
+        <div><label class="form-lbl">Mobile</label><input type="tel" id="heMobile" maxlength="10"></div>
+        <div><label class="form-lbl">Vehicle</label><input type="text" id="heVehicle" style="text-transform:uppercase"></div>
+      </div>
+      <div class="two-col" style="margin-bottom:10px">
+        <div><label class="form-lbl">Item</label>
+          <select id="heItem">
+            <option value="">Select…</option>
+            <option>Electronics</option><option>Clothing / Textile</option><option>Documents</option>
+            <option>Furniture</option><option>Auto Parts</option><option>Grocery / Food</option>
+            <option>Medicine / Medical</option><option>Machinery</option><option>Bags / Luggage</option><option>Other</option>
+          </select>
+        </div>
+        <div><label class="form-lbl">Booked By</label><select id="heBookedBy"></select></div>
+      </div>
+      <div class="two-col" style="margin-bottom:10px">
+        <div><label class="form-lbl">Amount (₹)</label><input type="number" id="heAmt" min="0"></div>
+        <div><label class="form-lbl">Payment Type</label>
+          <div class="pay-toggle">
+            <div class="pay-opt sel-paid" id="heOptP" onclick="heSelPay('Paid')">✅ Paid</div>
+            <div class="pay-opt"          id="heOptT" onclick="heSelPay('ToPay')">⏳ ToPay</div>
+          </div>
+          <input type="hidden" id="hePay" value="Paid">
+        </div>
+      </div>
+      <input type="hidden" id="heIdx">
+    </div>
+    <div class="mfoot">
+      <button class="btn-mc"  onclick="closeModal('histEditModal')">Cancel</button>
+      <button class="btn-mok" onclick="saveHistEntry()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="printArea"></div>
+
+<!-- FIREBASE COMPAT SDK (no module scope issues) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+// ══ FIREBASE ══════════════════════════════════════════
+firebase.initializeApp({
+  apiKey:"AIzaSyC82PfxOQk8XF2oZQ-_OSjUWeJ86UNz4gM",
+  authDomain:"parcel-booking-84abf.firebaseapp.com",
+  projectId:"parcel-booking-84abf",
+  storageBucket:"parcel-booking-84abf.appspot.com",
+  messagingSenderId:"101852597332",
+  appId:"1:101852597332:web:d99d04f944d111ad1731c1",
+  databaseURL:"https://parcel-booking-84abf-default-rtdb.asia-southeast1.firebasedatabase.app"
+});
+const db   = firebase.firestore();
+const rtdb = firebase.database();
+
+// ══ STATE ═════════════════════════════════════════════
+let currentUser       = null;   // null = staff, {username,role:'admin'} = admin
+let session           = null;
+let entries           = [];
+let currentFilter     = 'all';
+let histSessions      = [];
+let currentHistSess   = null;
+let pendingEntry      = null;
+let bookedByNames     = ['Rafi','Vignesh','Koyambedu office','Kilambakkam'];
+let unsubSess         = null;
+let unsubEntries      = null;
+
+// ══ BOOT ══════════════════════════════════════════════
+const savedAdmin = localStorage.getItem('pb_admin_v3');
+if (savedAdmin) {
+  try {
+    currentUser = JSON.parse(savedAdmin);
+    launchApp();
+  } catch(e) { localStorage.removeItem('pb_admin_v3'); }
+}
+// Always show landing if not auto-logged in
+
+// ══ LANDING ═══════════════════════════════════════════
+window.startAsStaff = () => {
+  currentUser = { username:'staff', role:'staff' };
+  launchApp();
+  toast('Welcome! Open for booking 📦','success');
+};
+
+window.showAdminLogin = () => {
+  document.getElementById('landingScreen').style.display      = 'none';
+  document.getElementById('adminLoginScreen').style.display   = 'flex';
+  setTimeout(()=>document.getElementById('adminUser').focus(),80);
+};
+
+window.backToLanding = () => {
+  document.getElementById('adminLoginScreen').style.display = 'none';
+  document.getElementById('adminLoginErr').style.display    = 'none';
+  document.getElementById('adminUser').value = '';
+  document.getElementById('adminPass').value = '';
+  document.getElementById('landingScreen').style.display    = 'flex';
+};
+
+window.doAdminLogin = () => {
+  const u   = document.getElementById('adminUser').value.trim().toLowerCase();
+  const p   = document.getElementById('adminPass').value.trim();
+  const err = document.getElementById('adminLoginErr');
+  // Admin credentials
+  if ((u==='admin' && p==='admin')) {
+    currentUser = { username:u, role:'admin' };
+    localStorage.setItem('pb_admin_v3', JSON.stringify(currentUser));
+    document.getElementById('adminLoginScreen').style.display = 'none';
+    launchApp();
+    toast('Welcome Admin 👑','success');
+  } else {
+    err.style.display = 'block';
+    document.getElementById('adminPass').value = '';
+  }
+};
+
+window.handleExit = () => {
+  if (currentUser && currentUser.role==='admin') {
+    if (!confirm('Logout from admin?')) return;
+    localStorage.removeItem('pb_admin_v3');
+    rtdb.ref('presence/admin').remove().catch(()=>{});
+  } else {
+    rtdb.ref('presence/staff').remove().catch(()=>{});
+  }
+  if (unsubSess)    unsubSess();
+  if (unsubEntries) unsubEntries();
+  currentUser = null;
+  document.getElementById('appHeader').style.display = 'none';
+  document.getElementById('navTabs').style.display   = 'none';
+  document.getElementById('landingScreen').style.display = 'flex';
+};
+
+function launchApp() {
+  document.getElementById('landingScreen').style.display     = 'none';
+  document.getElementById('adminLoginScreen').style.display  = 'none';
+  document.getElementById('appHeader').style.display         = 'flex';
+  document.getElementById('navTabs').style.display           = 'flex';
+  const badge = document.getElementById('userBadge');
+  const btn   = document.getElementById('btnExit');
+  if (currentUser.role==='admin') {
+    badge.textContent = '👑 Admin';
+    badge.className   = 'user-badge admin-badge';
+    btn.textContent   = 'Logout';
+  } else {
+    badge.textContent = '👤 Staff';
+    badge.className   = 'user-badge';
+    btn.textContent   = '← Exit';
+  }
+  switchTab('booking');
+  loadBookedByNames();
+  startListeners();
+  trackPresence();
+}
+
+// ══ PRESENCE ══════════════════════════════════════════
+function trackPresence() {
+  if (!currentUser) return;
+  const presRef = rtdb.ref('presence/' + currentUser.username);
+  presRef.set({ online:true, username:currentUser.username, ts:Date.now() });
+  presRef.onDisconnect().remove();
+  rtdb.ref('presence').on('value', snap => {
+    const c = snap.exists() ? Object.keys(snap.val()).length : 0;
+    document.getElementById('onlineChip').textContent = '👥 ' + c;
+  });
+}
+
+// ══ TABS ══════════════════════════════════════════════
+window.switchTab = tab => {
+  ['booking','history'].forEach(t => {
+    document.getElementById('page'+cap(t)).classList.toggle('active', t===tab);
+    document.getElementById('tab'+cap(t)).classList.toggle('active',  t===tab);
+  });
+  if (tab==='history') loadHistory();
+};
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+// ══ LISTENERS ═════════════════════════════════════════
+function startListeners() {
+  unsubSess = db.doc('session/today').onSnapshot(snap => {
+    session = snap.exists ? snap.data() : null;
+    renderAll();
+  });
+  unsubEntries = db.collection('session/today/entries').onSnapshot(snap => {
+    entries = snap.docs.map(d=>({_id:d.id,...d.data()}));
+    entries.sort((a,b)=>(b.ts||0)-(a.ts||0));
+    renderAll();
+  });
+}
+
+// ══ BOOKED BY NAMES ═══════════════════════════════════
+async function loadBookedByNames() {
+  try {
+    const snap = await db.doc('settings/bookedBy').get();
+    if (snap.exists && snap.data().names) bookedByNames = snap.data().names;
+  } catch(e){}
+  fillBookedByDropdowns();
+}
+
+function fillBookedByDropdowns() {
+  ['fBookedBy','heBookedBy'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Select…</option>' +
+      bookedByNames.map(n=>`<option value="${h(n)}">${h(n)}</option>`).join('');
+    if (cur) sel.value = cur;
+  });
+}
+
+async function saveByNames() {
+  try {
+    await db.doc('settings/bookedBy').set({ names: bookedByNames });
+    fillBookedByDropdowns();
+    toast('Names saved ✅','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+}
+
+window.openManageBookedBy = () => {
+  renderByList();
+  document.getElementById('newByName').value = '';
+  document.getElementById('manageByModal').classList.add('show');
+};
+
+function renderByList() {
+  const el = document.getElementById('byList');
+  if (!bookedByNames.length) {
+    el.innerHTML='<div style="padding:14px;text-align:center;color:var(--muted);font-size:0.8rem">No names yet</div>';
+    return;
+  }
+  el.innerHTML = bookedByNames.map((n,i)=>`
+    <div class="by-item">
+      <span class="by-nm">${h(n)}</span>
+      <div class="by-acts">
+        <button class="act-btn edit" onclick="openEditBy(${i})" style="padding:4px 9px">✏️</button>
+        <button class="act-btn del"  onclick="deleteBy(${i})"  style="padding:4px 9px">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+window.addByName = async () => {
+  const v = document.getElementById('newByName').value.trim();
+  if (!v) { toast('Enter a name','error'); return; }
+  if (bookedByNames.includes(v)) { toast('Already exists','error'); return; }
+  bookedByNames.push(v);
+  document.getElementById('newByName').value='';
+  renderByList();
+  await saveByNames();
+};
+
+window.openEditBy = idx => {
+  document.getElementById('editByInput').value = bookedByNames[idx];
+  document.getElementById('editByIdx').value   = idx;
+  document.getElementById('editByModal').classList.add('show');
+};
+
+window.saveEditBy = async () => {
+  const idx = parseInt(document.getElementById('editByIdx').value);
+  const v   = document.getElementById('editByInput').value.trim();
+  if (!v) { toast('Enter a name','error'); return; }
+  bookedByNames[idx] = v;
+  closeModal('editByModal');
+  renderByList();
+  await saveByNames();
+};
+
+window.deleteBy = async idx => {
+  if (!confirm('Remove "'+bookedByNames[idx]+'"?')) return;
+  bookedByNames.splice(idx,1);
+  renderByList();
+  await saveByNames();
+};
+
+// ══ SESSION ════════════════════════════════════════════
+window.startSession = async () => {
+  if (session&&session.active){ toast('Session already active!','error'); return; }
+  const now = new Date();
+  try {
+    await db.doc('session/today').set({
+      active:true,
+      startTime:now.toISOString(),
+      date:now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}),
+      dateKey:now.toISOString().slice(0,10)
+    });
+    toast('Session started! 🚀','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+window.closeSession = () => {
+  if (!session||!session.active) return;
+  if (entries.length===0){ toast('No entries to close!','error'); return; }
+  renderReport(session, entries, true);
+  document.getElementById('btnConfirm').style.display='inline-block';
+  document.getElementById('reportOverlay').classList.add('show');
+};
+
+window.closeReport   = () => { document.getElementById('reportOverlay').classList.remove('show'); toast('Back to check entries ✏️'); };
+window.openConfirmCloseModal = () => document.getElementById('confirmCloseModal').classList.add('show');
+window.closeModal    = id => document.getElementById(id).classList.remove('show');
+
+window.doConfirmClose = async () => {
+  closeModal('confirmCloseModal');
+  try {
+    const now    = new Date();
+    const t      = calcTotals(entries);
+    // Unique ID: dateKey_timestamp ensures multiple sessions per day are all saved separately
+    const histId = (session.dateKey||now.toISOString().slice(0,10))+'_'+now.getTime();
+    await db.doc('history/'+histId).set({
+      histId, date:session.date,
+      dateKey:session.dateKey||now.toISOString().slice(0,10),
+      startTime:session.startTime, closedAt:now.toISOString(),
+      savedAt:now.getTime(), count:entries.length,
+      paidAmt:t.paidAmt, topayAmt:t.topayAmt, gross:t.gross,
+      commission:t.commission, net:t.net, cashBalance:t.cashBalance,
+      entries:entries.map(e=>({
+        lr:e.lr,name:e.name,mobile:e.mobile,vehicle:e.vehicle,
+        amount:e.amount,payType:e.payType,time:e.time||'',
+        item:e.item||'',bookedBy:e.bookedBy||'',note:e.note||''
+      }))
+    });
+    const batch = db.batch();
+    entries.forEach(e=>batch.delete(db.doc('session/today/entries/'+e._id)));
+    await batch.commit();
+    await db.doc('session/today').set({active:false,closedAt:now.toISOString()});
+    document.getElementById('reportOverlay').classList.remove('show');
+    toast('Session closed & saved ✅','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+// ══ PAY TOGGLE ════════════════════════════════════════
+window.selPay = type => {
+  document.getElementById('fPayType').value    = type;
+  document.getElementById('optPaid').className  = 'pay-opt'+(type==='Paid' ?' sel-paid':'');
+  document.getElementById('optTopay').className = 'pay-opt'+(type==='ToPay'?' sel-topay':'');
+};
+
+// ══ ENTRY PREVIEW ═════════════════════════════════════
+window.previewEntry = () => {
+  if (!session||!session.active) return;
+  const lr       = document.getElementById('fLR').value.trim().toUpperCase();
+  const name     = document.getElementById('fName').value.trim();
+  const mobile   = document.getElementById('fMobile').value.trim();
+  const vehicle  = document.getElementById('fVehicle').value.trim().toUpperCase();
+  const item     = document.getElementById('fItem').value;
+  const bookedBy = document.getElementById('fBookedBy').value;
+  const amount   = parseFloat(document.getElementById('fAmount').value);
+  const payType  = document.getElementById('fPayType').value;
+  const note     = document.getElementById('fNote').value.trim();
+  const editId   = document.getElementById('fEditId').value;
+  if (!lr)               { toast('Enter LR No.','error'); return; }
+  if (!name)             { toast('Enter sender name','error'); return; }
+  if (mobile.length<10)  { toast('Enter valid 10-digit mobile','error'); return; }
+  if (!vehicle)          { toast('Enter vehicle number','error'); return; }
+  if (!amount||amount<=0){ toast('Enter valid amount','error'); return; }
+  pendingEntry = {lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,editId};
+  const pc = payType==='Paid'?'green':'orange';
+  const pl = payType==='Paid'?'✅ Paid':'⏳ To Pay';
+  document.getElementById('pvGrid').innerHTML =
+    `<div class="pf"><div class="pf-l">LR No.</div><div class="pf-v blue">${h(lr)}</div></div>
+     <div class="pf"><div class="pf-l">Sender Name</div><div class="pf-v">${h(name)}</div></div>
+     <div class="pf"><div class="pf-l">Mobile</div><div class="pf-v">${h(mobile)}</div></div>
+     <div class="pf"><div class="pf-l">Vehicle</div><div class="pf-v">${h(vehicle)}</div></div>
+     <div class="pf"><div class="pf-l">Item</div><div class="pf-v">${h(item)||'–'}</div></div>
+     <div class="pf"><div class="pf-l">Booked By</div><div class="pf-v">${h(bookedBy)||'–'}</div></div>
+     <div class="pf"><div class="pf-l">Amount</div><div class="pf-v green">₹${amount.toFixed(2)}</div></div>
+     <div class="pf"><div class="pf-l">Payment</div><div class="pf-v ${pc}">${pl}</div></div>
+     ${note?`<div class="pf full"><div class="pf-l">Note</div><div class="pf-v" style="font-size:0.82rem;font-weight:500">${h(note)}</div></div>`:''}`;
+  document.getElementById('previewModal').classList.add('show');
+};
+
+// Customer WhatsApp (from preview modal)
+window.sendToCustomerWA = () => {
+  if (!pendingEntry) return;
+  const d = pendingEntry;
+  const msg =
+    `🚚 *ANS Travels – Parcel Receipt*\n`+
+    `━━━━━━━━━━━━━━━━━━━━━\n`+
+    `📋 *LR No:* ${d.lr}\n`+
+    `👤 *Name:* ${d.name}\n`+
+    `📱 *Mobile:* ${d.mobile}\n`+
+    `🚛 *Vehicle:* ${d.vehicle}\n`+
+    `📦 *Item:* ${d.item||'–'}\n`+
+    `👤 *Booked By:* ${d.bookedBy||'–'}\n`+
+    `━━━━━━━━━━━━━━━━━━━━━\n`+
+    `💰 *Amount:* ₹${d.amount.toFixed(2)}\n`+
+    `💳 *Payment:* ${d.payType==='Paid'?'✅ Paid':'⏳ To Pay'}\n`+
+    `${d.note?`📝 *Note:* ${d.note}\n`:''}`+
+    `━━━━━━━━━━━━━━━━━━━━━\n`+
+    `_Thank you for choosing ANS Travels!_\n`+
+    `📅 ${new Date().toLocaleDateString('en-IN')}`;
+  const mob = d.mobile.replace(/\D/g,'');
+  window.open('https://wa.me/91'+mob+'?text='+encodeURIComponent(msg),'_blank');
+};
+
+// Print receipt (from preview modal)
+window.printReceipt = () => {
+  if (!pendingEntry) return;
+  const d   = pendingEntry;
+  const now = new Date().toLocaleString('en-IN');
+  document.getElementById('printArea').innerHTML = `
+  <style>
+    @page{size:80mm auto;margin:4mm}
+    #printArea{font-family:Arial,sans-serif;font-size:11px;max-width:72mm;margin:0 auto;color:#111}
+    .rh{text-align:center;border-bottom:2px dashed #ccc;padding-bottom:8px;margin-bottom:8px}
+    .rh h2{font-size:16px;margin:0;font-family:Georgia,serif}.rh p{font-size:9px;margin:2px 0;color:#555}
+    .rrow{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:10.5px}
+    .rrow .rl{color:#666}.rrow .rv{font-weight:700;text-align:right;max-width:58%}
+    .rpay{text-align:center;margin:10px 0;padding:8px;border-radius:6px;font-weight:700;font-size:13px}
+    .rp{background:#dcfce7;color:#166534;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .rt{background:#fff7ed;color:#c2410c;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .ramt{text-align:center;font-size:18px;font-weight:700;margin:8px 0}
+    .rft{text-align:center;margin-top:10px;font-size:9px;color:#888;border-top:2px dashed #ccc;padding-top:8px}
+    .rlr{text-align:center;font-size:19px;font-weight:700;color:#1a56db;letter-spacing:1px;margin-bottom:4px}
+  </style>
+  <div class="rh"><h2>🚚 ANS Travels</h2><p>PARCEL BOOKING RECEIPT</p><p>${now}</p></div>
+  <div class="rlr">${h(d.lr)}</div>
+  <div class="rrow"><span class="rl">Sender Name</span><span class="rv">${h(d.name)}</span></div>
+  <div class="rrow"><span class="rl">Mobile</span><span class="rv">${h(d.mobile)}</span></div>
+  <div class="rrow"><span class="rl">Vehicle No.</span><span class="rv">${h(d.vehicle)}</span></div>
+  <div class="rrow"><span class="rl">Item</span><span class="rv">${h(d.item||'–')}</span></div>
+  <div class="rrow"><span class="rl">Booked By</span><span class="rv">${h(d.bookedBy||'–')}</span></div>
+  ${d.note?`<div class="rrow"><span class="rl">Note</span><span class="rv">${h(d.note)}</span></div>`:''}
+  <div class="ramt">₹${d.amount.toFixed(2)}</div>
+  <div class="rpay ${d.payType==='Paid'?'rp':'rt'}">${d.payType==='Paid'?'✅ PAID':'⏳ TO PAY'}</div>
+  <div class="rft">Thank you for choosing ANS Travels!<br>Keep this receipt for reference.</div>`;
+  window.print();
+};
+
+// ══ SUBMIT ENTRY ══════════════════════════════════════
+window.submitEntry = async () => {
+  closeModal('previewModal');
+  if (!pendingEntry) return;
+  const {lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,editId} = pendingEntry;
+  const btn = document.getElementById('btnAdd');
+  btn.disabled = true;
+  try {
+    if (editId) {
+      await db.doc('session/today/entries/'+editId).update({lr,name,mobile,vehicle,item,bookedBy,amount,payType,note});
+      toast('Entry updated ✅','success');
+      cancelEdit();
+    } else {
+      if (entries.find(e=>e.lr===lr)){ toast('LR No. already exists!','error'); btn.disabled=false; return; }
+      const now = new Date();
+      await db.collection('session/today/entries').add({
+        lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,
+        ts:now.getTime(),
+        time:now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+      });
+      toast('Entry added ✅','success');
+      clearForm();
+    }
+  } catch(e){ toast('Error: '+e.message,'error'); }
+  btn.disabled = false;
+  pendingEntry = null;
+};
+
+window.editEntry = fid => {
+  const e = entries.find(x=>x._id===fid);
+  if (!e) return;
+  document.getElementById('fLR').value       = e.lr;
+  document.getElementById('fName').value     = e.name;
+  document.getElementById('fMobile').value   = e.mobile;
+  document.getElementById('fVehicle').value  = e.vehicle;
+  document.getElementById('fItem').value     = e.item||'';
+  document.getElementById('fBookedBy').value = e.bookedBy||'';
+  document.getElementById('fAmount').value   = e.amount;
+  document.getElementById('fNote').value     = e.note||'';
+  document.getElementById('fEditId').value   = e._id;
+  selPay(e.payType);
+  document.getElementById('formTitle').textContent = '✏️ Edit Entry — '+e.lr;
+  document.getElementById('btnAdd').textContent    = '👁 Review & Update';
+  document.getElementById('btnAdd').className      = 'btn-add upd';
+  document.getElementById('btnCancelEdit').style.display = 'block';
+  document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
+};
+
+window.cancelEdit = () => {
+  document.getElementById('fEditId').value = '';
+  document.getElementById('formTitle').textContent = '✏️ New Entry';
+  document.getElementById('btnAdd').textContent    = '👁 Review & Add Entry';
+  document.getElementById('btnAdd').className      = 'btn-add';
+  document.getElementById('btnCancelEdit').style.display = 'none';
+  clearForm();
+};
+
+window.deleteEntry = async fid => {
+  if (!confirm('Remove this entry?')) return;
+  try { await db.doc('session/today/entries/'+fid).delete(); toast('Entry removed'); }
+  catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+function clearForm() {
+  ['fLR','fName','fMobile','fVehicle','fAmount','fNote'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fItem').value='';
+  document.getElementById('fBookedBy').value='';
+  selPay('Paid');
+}
+
+// ══ FILTER ════════════════════════════════════════════
+window.setFilter = f => {
+  currentFilter = f;
+  document.getElementById('fAll').className   = 'fbtn'+(f==='all'   ?' fa':'');
+  document.getElementById('fPaid').className  = 'fbtn'+(f==='paid'  ?' fp':'');
+  document.getElementById('fTopay').className = 'fbtn'+(f==='topay' ?' ft':'');
+  renderEntries();
+};
+
+// ══ RENDER ALL ════════════════════════════════════════
+function renderAll() {
+  const active = session&&session.active;
+  document.getElementById('btnStart').disabled      = !!active;
+  document.getElementById('btnCloseSess').disabled  = !active;
+  document.getElementById('formCard').style.display    = active?'block':'none';
+  document.getElementById('noSessMsg').style.display   = active?'none':'block';
+  document.getElementById('entriesCard').style.display = active?'block':'none';
+  document.getElementById('infoStrip').style.display   = active?'flex':'none';
+  document.getElementById('bottomBtns').style.display  = active?'flex':'none';
+  if (active) {
+    document.getElementById('infoDate').textContent  = session.date;
+    const tot = entries.reduce((s,e)=>s+parseFloat(e.amount||0),0);
+    document.getElementById('infoCount').textContent  = entries.length;
+    document.getElementById('infoTotal').textContent  = tot.toFixed(2);
+    document.getElementById('entryCount').textContent = entries.length;
+  }
+  renderEntries();
+}
+
+function renderEntries() {
+  const list = document.getElementById('entriesList');
+  if (!session||!session.active||entries.length===0){
+    list.innerHTML='<div class="empty-st"><div style="font-size:2rem;opacity:0.3;margin-bottom:7px">📋</div>No entries yet</div>';
+    return;
+  }
+  let filt = [...entries];
+  if (currentFilter==='paid')  filt = entries.filter(e=>e.payType==='Paid');
+  if (currentFilter==='topay') filt = entries.filter(e=>e.payType==='ToPay');
+  if (!filt.length){
+    list.innerHTML='<div class="empty-st"><div style="font-size:1.8rem;opacity:0.3;margin-bottom:7px">🔍</div>No entries for this filter</div>';
+    return;
+  }
+  const isAdmin = currentUser&&currentUser.role==='admin';
+  const rows = filt.map((e,i)=>`
+    <tr>
+      <td style="color:#aaa;font-size:0.63rem">${filt.length-i}</td>
+      <td><span class="td-lr">${h(e.lr||'–')}</span></td>
+      <td><div class="td-nm">${h(e.name)}</div><div class="td-sb">📱 ${h(e.mobile)}</div></td>
+      <td style="font-size:0.72rem">${h(e.vehicle)}</td>
+      <td style="font-size:0.71rem">${h(e.item||'–')}</td>
+      <td style="font-size:0.71rem">${h(e.bookedBy||'–')}</td>
+      <td><span class="tag ${e.payType==='Paid'?'tg-p':'tg-t'}">${e.payType==='Paid'?'Paid':'ToPay'}</span></td>
+      <td style="font-weight:700;white-space:nowrap;font-size:0.82rem">₹${parseFloat(e.amount||0).toFixed(2)}</td>
+      <td><div class="act-btns">
+        <button class="act-btn edit" onclick="editEntry('${e._id}')">✏️</button>
+        ${isAdmin?`<button class="act-btn del" onclick="deleteEntry('${e._id}')">✕</button>`:''}
+      </div></td>
+    </tr>`).join('');
+  list.innerHTML=`<table class="etbl"><thead><tr><th>#</th><th>LR</th><th>Name/Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type</th><th>Amount</th><th>Act</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ══ CALC ══════════════════════════════════════════════
+function calcTotals(ents) {
+  const paidAmt  = ents.filter(e=>e.payType==='Paid').reduce((s,e)=>s+parseFloat(e.amount||0),0);
+  const topayAmt = ents.filter(e=>e.payType==='ToPay').reduce((s,e)=>s+parseFloat(e.amount||0),0);
+  const gross=paidAmt+topayAmt, comm=gross*0.20, net=gross-comm, cash=net-topayAmt;
+  return {paidAmt,topayAmt,gross,commission:comm,net,cashBalance:cash,
+    paidCount:ents.filter(e=>e.payType==='Paid').length,
+    topayCount:ents.filter(e=>e.payType==='ToPay').length};
+}
+
+// ══ REPORT RENDER ═════════════════════════════════════
+function renderReport(sess, ents, isLive) {
+  const t = calcTotals(ents);
+  const tm = isLive
+    ? new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+    : (sess.closedAt?new Date(sess.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–');
+  document.getElementById('rptMeta').innerHTML  = `<span>📅 ${sess.date}</span><span>📦 ${ents.length} Entries</span><span>⏰ ${tm}</span>`;
+  document.getElementById('rptBadge').innerHTML = `${ents.length}<br><span style="font-size:0.61rem;opacity:0.8">entries</span>`;
+  document.getElementById('rptBody').innerHTML  = buildRows(ents,false);
+  document.getElementById('rptSumm').innerHTML  = summGrid(t);
+  document.getElementById('rptCalc').innerHTML  = calcBlk(t);
+}
+
+function buildRows(ents, withAct) {
+  return [...ents].reverse().map((e,i)=>{
+    const oi = ents.length-1-i;
+    return `<tr>
+      <td style="color:#aaa;font-size:0.63rem">${i+1}</td>
+      <td class="r-lr">${h(e.lr||'–')}</td>
+      <td><div class="r-nm">${h(e.name)}</div><div class="r-sb">${h(e.mobile)}</div></td>
+      <td style="font-size:0.7rem;color:var(--muted)">${h(e.vehicle)}</td>
+      <td style="font-size:0.7rem">${h(e.item||'–')}</td>
+      <td style="font-size:0.7rem">${h(e.bookedBy||'–')}</td>
+      <td><span class="tag ${e.payType==='Paid'?'tg-p':'tg-t'}" style="font-size:0.6rem">${e.payType}</span></td>
+      <td class="r-am" style="text-align:right">₹${parseFloat(e.amount||0).toFixed(2)}</td>
+      ${withAct?`<td><div class="act-btns"><button class="act-btn edit" onclick="histEditEnt(${oi})">✏️</button><button class="act-btn del" onclick="histDelEnt(${oi})">✕</button></div></td>`:''}
+    </tr>`;
+  }).join('');
+}
+
+function summGrid(t) {
+  return `<div class="sc"><div class="sl">Paid Amount</div><div class="sv green">₹${t.paidAmt.toFixed(2)}</div><div style="font-size:0.64rem;color:var(--muted);margin-top:2px">${t.paidCount} entries</div></div>
+          <div class="sc"><div class="sl">To Pay Amount</div><div class="sv orange">₹${t.topayAmt.toFixed(2)}</div><div style="font-size:0.64rem;color:var(--muted);margin-top:2px">${t.topayCount} entries</div></div>`;
+}
+function calcBlk(t) {
+  return `<div class="cr hl-b"><span class="cl">Gross Total (Paid + To Pay)</span><span class="cv">₹${t.gross.toFixed(2)}</span></div>
+          <div class="dvl"></div>
+          <div class="cr hl-r"><span class="cl">Commission (20% on Gross)</span><span class="cv">– ₹${t.commission.toFixed(2)}</span></div>
+          <div class="cr hl-g"><span class="cl">NET AMOUNT</span><span class="cv">₹${t.net.toFixed(2)}</span></div>
+          <div class="dvl"></div>
+          <div class="cr hl-p"><span class="cl">Cash Balance (Net − To Pay)</span><span class="cv">₹${t.cashBalance.toFixed(2)}</span></div>`;
+}
+
+// ══ WHATSAPP REPORT ═══════════════════════════════════
+function buildWAMsg(sess, ents) {
+  const t   = calcTotals(ents);
+  const now = new Date();
+  let m = `🚚 *ANS Travels – Parcel Booking*\n📅 *Date:* ${sess.date}\n⏰ *Time:* ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}\n${'─'.repeat(26)}\n*ENTRIES (${ents.length})*\n`;
+  [...ents].reverse().forEach((e,i)=>{
+    m+=`\n${i+1}. *${e.lr||'–'}* | ${e.name}\n   📱 ${e.mobile} | 🚛 ${e.vehicle}\n`;
+    if(e.item)     m+=`   📦 ${e.item}`;
+    if(e.bookedBy) m+=` | 👤 ${e.bookedBy}`;
+    if(e.item||e.bookedBy) m+='\n';
+    m+=`   💰 ₹${parseFloat(e.amount||0).toFixed(2)} | ${e.payType==='Paid'?'✅ Paid':'⏳ ToPay'}\n`;
+    if(e.note) m+=`   📝 ${e.note}\n`;
+  });
+  m+=`\n${'─'.repeat(26)}\n*SUMMARY*\n✅ Paid: ₹${t.paidAmt.toFixed(2)} (${t.paidCount})\n⏳ ToPay: ₹${t.topayAmt.toFixed(2)} (${t.topayCount})\n📊 Gross: ₹${t.gross.toFixed(2)}\n💼 Comm(20%): –₹${t.commission.toFixed(2)}\n💚 *Net: ₹${t.net.toFixed(2)}*\n💵 *Cash Bal: ₹${t.cashBalance.toFixed(2)}*\n\n_ANS Travels Booking System_`;
+  return m;
+}
+
+window.sendWA = src => {
+  let sess, ents;
+  if (src==='hist'&&currentHistSess){ sess=currentHistSess; ents=currentHistSess.entries||[]; }
+  else { sess=session; ents=entries; }
+  if (!sess||!ents.length){ toast('No data to send','error'); return; }
+  window.open('https://wa.me/?text='+encodeURIComponent(buildWAMsg(sess,ents)),'_blank');
+};
+
+// ══ HISTORY ═══════════════════════════════════════════
+async function loadHistory() {
+  document.getElementById('histList').innerHTML =
+    '<div class="hist-empty"><div style="font-size:1.8rem;margin-bottom:8px">⏳</div>Loading sessions…</div>';
+  let sessions = [];
+  try {
+    // Try ordered query first (requires Firestore index)
+    const snap = await db.collection('history').orderBy('savedAt','desc').limit(30).get();
+    sessions = snap.docs.map(d=>d.data());
+  } catch(e) {
+    // Fallback: get all, sort client-side, take 30 most recent
+    try {
+      const snap2 = await db.collection('history').get();
+      sessions = snap2.docs.map(d=>d.data())
+        .sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))
+        .slice(0,30);
+    } catch(e2){ toast('Error: '+e2.message,'error'); return; }
+  }
+  histSessions = sessions;
+  renderHistList();
+}
+
+function renderHistList() {
+  const el = document.getElementById('histList');
+  if (!histSessions.length){
+    el.innerHTML='<div class="hist-empty"><div style="font-size:2rem;margin-bottom:8px">📊</div>No sessions found yet</div>';
+    return;
+  }
+  const isAdmin = currentUser&&currentUser.role==='admin';
+  el.innerHTML = histSessions.map((s,i)=>`
+    <div class="hist-card">
+      <div class="hist-inner">
+        <div class="hist-l" onclick="openHistDet(${i})">
+          <div class="hist-dt">📅 ${s.date}</div>
+          <div class="hist-mt">📦 ${s.count||0} entries &nbsp;|&nbsp; ✅ ₹${(s.paidAmt||0).toFixed(2)} &nbsp;|&nbsp; ⏳ ₹${(s.topayAmt||0).toFixed(2)}</div>
+          <div class="hist-mt" style="font-size:0.66rem;margin-top:1px">⏰ ${s.closedAt?new Date(s.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–'} &nbsp;|&nbsp; 💵 Cash: ₹${(s.cashBalance||(s.net-s.topayAmt)||0).toFixed(2)}</div>
+        </div>
+        <div class="hist-r" onclick="openHistDet(${i})">
+          <div class="hist-net">₹${(s.net||0).toFixed(2)}</div>
+          <div style="font-size:0.64rem;color:var(--muted)">Net</div>
+          <span class="hist-chv">›</span>
+        </div>
+        ${isAdmin?`<button class="hist-del" onclick="deleteHistSess(${i})" title="Delete session">🗑️</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// Admin: delete entire session
+window.deleteHistSess = async idx => {
+  const s = histSessions[idx];
+  if (!confirm(`Delete session "${s.date}" with ${s.count||0} entries?\nThis cannot be undone.`)) return;
+  try {
+    await db.doc('history/'+(s.histId||s.dateKey)).delete();
+    histSessions.splice(idx,1);
+    renderHistList();
+    toast('Session deleted 🗑️','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+window.openHistDet = idx => {
+  currentHistSess = histSessions[idx];
+  refreshHistDet();
+  document.getElementById('histDetOverlay').classList.add('show');
+};
+
+function refreshHistDet() {
+  const s    = currentHistSess;
+  if (!s) return;
+  const ents = s.entries||[];
+  const t    = calcTotals(ents);
+  const ct   = s.closedAt?new Date(s.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–';
+  document.getElementById('histMeta').innerHTML  = `<span>📅 ${s.date}</span><span>📦 ${ents.length} Entries</span><span>⏰ Closed: ${ct}</span>`;
+  document.getElementById('histBadge').innerHTML = `${ents.length}<br><span style="font-size:0.61rem;opacity:0.8">entries</span>`;
+  const isAdmin = currentUser&&currentUser.role==='admin';
+  document.getElementById('adminBar').style.display  = isAdmin?'flex':'none';
+  document.getElementById('actTh').style.display     = isAdmin?'':'none';
+  document.getElementById('histDetBody').innerHTML   = buildRows(ents,isAdmin);
+  document.getElementById('histSumm').innerHTML      = summGrid(t);
+  document.getElementById('histCalc').innerHTML      = calcBlk(t);
+  fillBookedByDropdowns();
+}
+
+window.closeHistDet = () => document.getElementById('histDetOverlay').classList.remove('show');
+
+// Admin: edit single entry in history
+window.histEditEnt = idx => {
+  const e = (currentHistSess.entries||[])[idx];
+  if (!e) return;
+  document.getElementById('heIdx').value     = idx;
+  document.getElementById('heLR').value      = e.lr||'';
+  document.getElementById('heName').value    = e.name||'';
+  document.getElementById('heMobile').value  = e.mobile||'';
+  document.getElementById('heVehicle').value = e.vehicle||'';
+  document.getElementById('heItem').value    = e.item||'';
+  document.getElementById('heBookedBy').value= e.bookedBy||'';
+  document.getElementById('heAmt').value     = e.amount||'';
+  heSelPay(e.payType||'Paid');
+  document.getElementById('histEditModal').classList.add('show');
+};
+
+window.heSelPay = type => {
+  document.getElementById('hePay').value     = type;
+  document.getElementById('heOptP').className = 'pay-opt'+(type==='Paid' ?' sel-paid':'');
+  document.getElementById('heOptT').className = 'pay-opt'+(type==='ToPay'?' sel-topay':'');
+};
+
+window.saveHistEntry = async () => {
+  const idx  = parseInt(document.getElementById('heIdx').value);
+  const lr   = document.getElementById('heLR').value.trim().toUpperCase();
+  const name = document.getElementById('heName').value.trim();
+  const veh  = document.getElementById('heVehicle').value.trim().toUpperCase();
+  const amt  = parseFloat(document.getElementById('heAmt').value);
+  if (!lr||!name||!veh||!amt){ toast('Fill required fields','error'); return; }
+  const ents = [...(currentHistSess.entries||[])];
+  ents[idx]  = {...ents[idx], lr, name,
+    mobile:   document.getElementById('heMobile').value.trim(),
+    vehicle:  veh,
+    item:     document.getElementById('heItem').value,
+    bookedBy: document.getElementById('heBookedBy').value,
+    amount:   amt,
+    payType:  document.getElementById('hePay').value
+  };
+  await saveHistFS(ents);
+  closeModal('histEditModal');
+  toast('Entry updated ✅','success');
+};
+
+window.histDelEnt = async idx => {
+  if (!confirm('Delete this entry from history?')) return;
+  const ents = [...(currentHistSess.entries||[])];
+  ents.splice(idx,1);
+  await saveHistFS(ents);
+  toast('Entry deleted');
+};
+
+async function saveHistFS(newEnts) {
+  const t      = calcTotals(newEnts);
+  const docId  = currentHistSess.histId||currentHistSess.dateKey;
+  const upd    = {...currentHistSess, entries:newEnts, count:newEnts.length,
+    paidAmt:t.paidAmt, topayAmt:t.topayAmt, gross:t.gross,
+    commission:t.commission, net:t.net, cashBalance:t.cashBalance};
+  await db.doc('history/'+docId).set(upd);
+  currentHistSess = upd;
+  const li = histSessions.findIndex(s=>(s.histId||s.dateKey)===(upd.histId||upd.dateKey));
+  if (li>=0) histSessions[li] = upd;
+  refreshHistDet();
+  renderHistList();
+}
+
+// ══ PRINT ═════════════════════════════════════════════
+window.printCurrentSummary = () => {
+  if (!session||!entries.length){ toast('No entries to print','error'); return; }
+  document.getElementById('printArea').innerHTML = buildPrint(session,entries,true);
+  window.print();
+};
+window.printReport = () => {
+  document.getElementById('printArea').innerHTML = buildPrint(session,entries,true);
+  window.print();
+};
+window.printHistDet = () => {
+  if (!currentHistSess) return;
+  document.getElementById('printArea').innerHTML = buildPrint(currentHistSess,currentHistSess.entries||[],false);
+  window.print();
+};
+
+function buildPrint(sess, ents, isCurrent) {
+  const t  = calcTotals(ents);
+  const ct = isCurrent
+    ? new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+    : (sess.closedAt?new Date(sess.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–');
+  const rows = [...ents].reverse().map((e,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td style="font-weight:700;color:#1a56db">${h(e.lr||'–')}</td>
+      <td><div style="font-weight:600">${h(e.name)}</div><div style="color:#777;font-size:9px">${h(e.mobile)}</div></td>
+      <td>${h(e.vehicle)}</td>
+      <td>${h(e.item||'–')}</td>
+      <td>${h(e.bookedBy||'–')}</td>
+      <td><span style="padding:2px 6px;border-radius:20px;font-size:9px;font-weight:700;background:${e.payType==='Paid'?'#dcfce7':'#fff7ed'};color:${e.payType==='Paid'?'#166534':'#c2410c'};-webkit-print-color-adjust:exact;print-color-adjust:exact">${e.payType}</span></td>
+      <td style="font-weight:700;text-align:right">₹${parseFloat(e.amount||0).toFixed(2)}</td>
+    </tr>`).join('');
+  return `<style>
+  @page{size:A4;margin:12mm 10mm}
+  #printArea{font-family:Arial,sans-serif;color:#111;font-size:10.5px}
+  .ph{background:linear-gradient(135deg,#1a56db,#0e3fa3);color:#fff;padding:14px 19px;display:flex;align-items:flex-start;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ph h2{margin:0;font-family:Georgia,serif;font-size:15px}.ph .sb{font-size:9px;opacity:0.8;margin-top:2px}
+  .ph .rb{background:rgba(255,255,255,0.18);border-radius:6px;padding:6px 10px;text-align:right;font-size:9px}
+  .mb{background:#f0f4f8;padding:6px 14px;display:flex;gap:12px;font-size:9.5px;color:#555;flex-wrap:wrap;-webkit-print-color-adjust:exact;print-color-adjust:exact;border-bottom:1px solid #dde3ec}
+  table{width:100%;border-collapse:collapse;font-size:10px;margin:11px 0}
+  th{background:#f0f4f8;padding:6px 7px;text-align:left;font-size:9px;color:#555;text-transform:uppercase;border:1px solid #dde3ec;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  td{padding:6px 7px;border:1px solid #e8edf5;vertical-align:top}
+  tr:nth-child(even) td{background:#fafbff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  tfoot td{background:#f0f4f8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sw{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
+  .sc{border:1px solid #dde3ec;border-radius:6px;padding:9px 11px}
+  .sc .sl{font-size:8.5px;color:#777;text-transform:uppercase;margin-bottom:2px}
+  .sc .sv{font-size:13px;font-weight:700}
+  .sc .sv.g{color:#0e9f6e}.sc .sv.o{color:#d97706}
+  .cb{border:1px solid #dde3ec;border-radius:6px;overflow:hidden}
+  .cr{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #e8edf5;font-size:10.5px}
+  .cr:last-child{border-bottom:none}
+  .cr.b{background:#eff6ff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .cr.b .cl{color:#1a56db;font-weight:600}.cr.b .cv{color:#1a56db;font-weight:700;font-size:11px}
+  .cr.r .cl{color:#e02424}.cr.r .cv{color:#e02424;font-weight:700}
+  .cr.g{background:#f0fdf4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .cr.g .cl{color:#0e9f6e;font-weight:700}.cr.g .cv{color:#0e9f6e;font-weight:700;font-size:13px}
+  .cr.p{background:#f5f3ff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .cr.p .cl{color:#7c3aed;font-weight:600}.cr.p .cv{color:#7c3aed;font-weight:700}
+  .ft{text-align:center;margin-top:13px;color:#bbb;font-size:8.5px;border-top:1px solid #e8edf5;padding-top:6px}
+  </style>
+  <div class="ph"><div><h2>🚚 ANS Travels</h2><div class="sb">PARCEL BOOKING – DAILY SESSION REPORT</div></div><div class="rb">${ents.length} Entries</div></div>
+  <div class="mb"><span>📅 <strong>${sess.date}</strong></span><span>⏰ Closed: <strong>${ct}</strong></span><span>📦 Entries: <strong>${ents.length}</strong></span><span>Generated: <strong>${new Date().toLocaleString('en-IN')}</strong></span></div>
+  <table>
+    <thead><tr><th>#</th><th>LR No</th><th>Name / Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type</th><th style="text-align:right">Amount (₹)</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td colspan="7" style="text-align:right;font-weight:700;font-size:10px">GROSS TOTAL</td><td style="text-align:right;font-weight:700;font-size:11px">₹${t.gross.toFixed(2)}</td></tr></tfoot>
+  </table>
+  <div class="sw">
+    <div class="sc"><div class="sl">Paid Amount</div><div class="sv g">₹${t.paidAmt.toFixed(2)}</div><div style="font-size:8.5px;color:#999">${t.paidCount} entries</div></div>
+    <div class="sc"><div class="sl">To Pay Amount</div><div class="sv o">₹${t.topayAmt.toFixed(2)}</div><div style="font-size:8.5px;color:#999">${t.topayCount} entries</div></div>
+  </div>
+  <div class="cb">
+    <div class="cr b"><span class="cl">Gross Total (Paid + To Pay)</span><span class="cv">₹${t.gross.toFixed(2)}</span></div>
+    <div class="cr r"><span class="cl">Commission (20% on Gross)</span><span class="cv">– ₹${t.commission.toFixed(2)}</span></div>
+    <div class="cr g"><span class="cl">NET AMOUNT</span><span class="cv">₹${t.net.toFixed(2)}</span></div>
+    <div class="cr p"><span class="cl">Cash Balance (Net − To Pay)</span><span class="cv">₹${t.cashBalance.toFixed(2)}</span></div>
+  </div>
+  <div class="ft">Generated by ANS Travels Parcel Booking System &nbsp;|&nbsp; ${new Date().toLocaleString('en-IN')} &nbsp;|&nbsp; User: ${currentUser?.username||'–'}</div>`;
+}
+
+// ══ UTILS ═════════════════════════════════════════════
+function h(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+let _tt;
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  clearTimeout(_tt); _tt=setTimeout(()=>{ t.className='toast '+type; },2800);
+}
+window.toast=toast;
+</script>
+</body>
+</html>
