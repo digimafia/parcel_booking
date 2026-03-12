@@ -404,6 +404,20 @@ table.rtbl tr:nth-child(even){background:#fafbff}
       <div class="ent-wrap"><div id="entriesList"></div></div>
     </div>
 
+    <!-- LOADING CHARGES -->
+    <div class="form-card" id="loadingCard" style="display:none;padding:12px 16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text);white-space:nowrap">🏋️ Loading Charges</div>
+        <div style="flex:1;display:flex;align-items:center;gap:8px">
+          <span style="font-size:0.9rem;font-weight:700;color:var(--muted)">₹</span>
+          <input type="number" id="loadingChargesInput" value="0" min="0" placeholder="0"
+            style="flex:1;font-size:1rem;font-weight:700;color:#7c3aed;border-color:#ddd8fe;background:#f5f3ff;padding:8px 10px"
+            oninput="updateLoadingCharges(this.value)">
+        </div>
+        <div style="font-size:0.7rem;color:var(--muted);text-align:right;white-space:nowrap">Deducted from<br>Cash Balance</div>
+      </div>
+    </div>
+
     <!-- BOTTOM ACTIONS -->
     <div class="bot-btns" id="bottomBtns" style="display:none">
       <button class="btn-outline"  onclick="printCurrentSummary()">🖨 Print Summary Report</button>
@@ -633,6 +647,7 @@ let pendingEntry      = null;
 let bookedByNames     = ['Rafi','Vignesh','Koyambedu office','Kilambakkam'];
 let unsubSess         = null;
 let unsubEntries      = null;
+let loadingCharges    = 0;   // manually entered per session
 
 // ══ BOOT ══════════════════════════════════════════════
 const savedAdmin = localStorage.getItem('pb_admin_v3');
@@ -869,7 +884,7 @@ window.doConfirmClose = async () => {
   closeModal('confirmCloseModal');
   try {
     const now    = new Date();
-    const t      = calcTotals(entries);
+    const t      = calcTotals(entries, loadingCharges);
     // Unique ID: dateKey_timestamp ensures multiple sessions per day are all saved separately
     const histId = (session.dateKey||now.toISOString().slice(0,10))+'_'+now.getTime();
     await db.doc('history/'+histId).set({
@@ -879,6 +894,7 @@ window.doConfirmClose = async () => {
       savedAt:now.getTime(), count:entries.length,
       paidAmt:t.paidAmt, topayAmt:t.topayAmt, gross:t.gross,
       commission:t.commission, net:t.net, cashBalance:t.cashBalance,
+      loadingCharges:loadingCharges,
       entries:entries.map(e=>({
         lr:e.lr,name:e.name,mobile:e.mobile,vehicle:e.vehicle,
         amount:e.amount,payType:e.payType,time:e.time||'',
@@ -1063,6 +1079,15 @@ function clearForm() {
   selPay('Paid');
 }
 
+// ══ LOADING CHARGES ═══════════════════════════════════
+window.updateLoadingCharges = val => {
+  loadingCharges = parseFloat(val)||0;
+  // Live-update the report if overlay is open
+  if (document.getElementById('reportOverlay').classList.contains('show') && session && entries.length) {
+    renderReport(session, entries, true);
+  }
+};
+
 // ══ FILTER ════════════════════════════════════════════
 window.setFilter = f => {
   currentFilter = f;
@@ -1082,6 +1107,7 @@ function renderAll() {
   document.getElementById('entriesCard').style.display = active?'block':'none';
   document.getElementById('infoStrip').style.display   = active?'flex':'none';
   document.getElementById('bottomBtns').style.display  = active?'flex':'none';
+  document.getElementById('loadingCard').style.display  = active?'block':'none';
   if (active) {
     document.getElementById('infoDate').textContent  = session.date;
     const tot = entries.reduce((s,e)=>s+parseFloat(e.amount||0),0);
@@ -1125,18 +1151,32 @@ function renderEntries() {
 }
 
 // ══ CALC ══════════════════════════════════════════════
-function calcTotals(ents) {
+function roundNearest(val) {
+  // Round to nearest 50 or 100 (whichever is closer)
+  const r50  = Math.round(val / 50) * 50;
+  const r100 = Math.round(val / 100) * 100;
+  return Math.abs(val - r50) <= Math.abs(val - r100) ? r50 : r100;
+}
+
+function calcTotals(ents, lc_arg) {
   const paidAmt  = ents.filter(e=>e.payType==='Paid').reduce((s,e)=>s+parseFloat(e.amount||0),0);
   const topayAmt = ents.filter(e=>e.payType==='ToPay').reduce((s,e)=>s+parseFloat(e.amount||0),0);
-  const gross=paidAmt+topayAmt, comm=gross*0.20, net=gross-comm, cash=net-topayAmt;
-  return {paidAmt,topayAmt,gross,commission:comm,net,cashBalance:cash,
+  const lc = parseFloat(lc_arg)||0;
+  const gross = paidAmt+topayAmt;
+  const commRaw = gross*0.20;
+  const comm = roundNearest(commRaw);          // round commission to nearest 50/100
+  const net  = gross - comm;
+  const cashRaw = net - topayAmt - lc;
+  const cash = roundNearest(cashRaw);           // round cash balance to nearest 50/100
+  return {paidAmt,topayAmt,gross,commission:comm,commRaw,net,cashBalance:cash,cashRaw,
+    loadingCharges:lc,
     paidCount:ents.filter(e=>e.payType==='Paid').length,
     topayCount:ents.filter(e=>e.payType==='ToPay').length};
 }
 
 // ══ REPORT RENDER ═════════════════════════════════════
 function renderReport(sess, ents, isLive) {
-  const t = calcTotals(ents);
+  const t = calcTotals(ents, isLive ? loadingCharges : (sess.loadingCharges||0));
   const tm = isLive
     ? new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
     : (sess.closedAt?new Date(sess.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–');
@@ -1165,21 +1205,32 @@ function buildRows(ents, withAct) {
 }
 
 function summGrid(t) {
+  const lcRow = t.loadingCharges > 0
+    ? `<div class="sc" style="grid-column:1/-1;border-color:#ddd8fe;background:#f5f3ff"><div class="sl" style="color:#7c3aed">Loading Charges</div><div class="sv" style="color:#7c3aed">– ₹${t.loadingCharges.toFixed(2)}</div></div>`
+    : '';
   return `<div class="sc"><div class="sl">Paid Amount</div><div class="sv green">₹${t.paidAmt.toFixed(2)}</div><div style="font-size:0.64rem;color:var(--muted);margin-top:2px">${t.paidCount} entries</div></div>
-          <div class="sc"><div class="sl">To Pay Amount</div><div class="sv orange">₹${t.topayAmt.toFixed(2)}</div><div style="font-size:0.64rem;color:var(--muted);margin-top:2px">${t.topayCount} entries</div></div>`;
+          <div class="sc"><div class="sl">To Pay Amount</div><div class="sv orange">₹${t.topayAmt.toFixed(2)}</div><div style="font-size:0.64rem;color:var(--muted);margin-top:2px">${t.topayCount} entries</div></div>
+          ${lcRow}`;
 }
 function calcBlk(t) {
+  const commNote = Math.abs(t.commRaw - t.commission) > 0.01
+    ? `<span style="font-size:0.62rem;color:#aaa;margin-left:5px">(actual ₹${t.commRaw.toFixed(0)}→rounded)</span>` : '';
+  const cashNote = Math.abs(t.cashRaw - t.cashBalance) > 0.01
+    ? `<span style="font-size:0.62rem;color:#aaa;margin-left:5px">(actual ₹${t.cashRaw.toFixed(0)}→rounded)</span>` : '';
+  const lcRow = t.loadingCharges > 0
+    ? `<div class="cr" style="background:#f5f3ff"><span class="cl" style="color:#7c3aed">Loading Charges</span><span class="cv" style="color:#7c3aed">– ₹${t.loadingCharges.toFixed(2)}</span></div>` : '';
   return `<div class="cr hl-b"><span class="cl">Gross Total (Paid + To Pay)</span><span class="cv">₹${t.gross.toFixed(2)}</span></div>
           <div class="dvl"></div>
-          <div class="cr hl-r"><span class="cl">Commission (20% on Gross)</span><span class="cv">– ₹${t.commission.toFixed(2)}</span></div>
+          <div class="cr hl-r"><span class="cl">Commission (20% on Gross) ${commNote}</span><span class="cv">– ₹${t.commission.toFixed(0)}</span></div>
           <div class="cr hl-g"><span class="cl">NET AMOUNT</span><span class="cv">₹${t.net.toFixed(2)}</span></div>
           <div class="dvl"></div>
-          <div class="cr hl-p"><span class="cl">Cash Balance (Net − To Pay)</span><span class="cv">₹${t.cashBalance.toFixed(2)}</span></div>`;
+          ${lcRow}
+          <div class="cr hl-p"><span class="cl">Cash Balance (Net − ToPay${t.loadingCharges>0?' − Loading':''}) ${cashNote}</span><span class="cv">₹${t.cashBalance.toFixed(0)}</span></div>`;
 }
 
 // ══ WHATSAPP REPORT ═══════════════════════════════════
 function buildWAMsg(sess, ents) {
-  const t   = calcTotals(ents);
+  const t   = calcTotals(ents, sess.loadingCharges||0);
   const now = new Date();
   let m = `🚚 *ANS Travels – Parcel Booking*\n📅 *Date:* ${sess.date}\n⏰ *Time:* ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}\n${'─'.repeat(26)}\n*ENTRIES (${ents.length})*\n`;
   [...ents].reverse().forEach((e,i)=>{
@@ -1190,7 +1241,8 @@ function buildWAMsg(sess, ents) {
     m+=`   💰 ₹${parseFloat(e.amount||0).toFixed(2)} | ${e.payType==='Paid'?'✅ Paid':'⏳ ToPay'}\n`;
     if(e.note) m+=`   📝 ${e.note}\n`;
   });
-  m+=`\n${'─'.repeat(26)}\n*SUMMARY*\n✅ Paid: ₹${t.paidAmt.toFixed(2)} (${t.paidCount})\n⏳ ToPay: ₹${t.topayAmt.toFixed(2)} (${t.topayCount})\n📊 Gross: ₹${t.gross.toFixed(2)}\n💼 Comm(20%): –₹${t.commission.toFixed(2)}\n💚 *Net: ₹${t.net.toFixed(2)}*\n💵 *Cash Bal: ₹${t.cashBalance.toFixed(2)}*\n\n_ANS Travels Booking System_`;
+  m+=`\n${'─'.repeat(26)}\n*SUMMARY*\n✅ Paid: ₹${t.paidAmt.toFixed(2)} (${t.paidCount})\n⏳ ToPay: ₹${t.topayAmt.toFixed(2)} (${t.topayCount})\n📊 Gross: ₹${t.gross.toFixed(2)}\n💼 Comm(20%): –₹${t.commission.toFixed(0)} _(rounded)_\n💚 *Net: ₹${t.net.toFixed(2)}*\n${t.loadingCharges>0?`🏋️ Loading: –₹${t.loadingCharges.toFixed(2)}\n`:''}`+
+  `💵 *Cash Bal: ₹${t.cashBalance.toFixed(0)}* _(rounded)_\n\n_ANS Travels Booking System_`;
   return m;
 }
 
@@ -1237,7 +1289,7 @@ function renderHistList() {
         <div class="hist-l" onclick="openHistDet(${i})">
           <div class="hist-dt">📅 ${s.date}</div>
           <div class="hist-mt">📦 ${s.count||0} entries &nbsp;|&nbsp; ✅ ₹${(s.paidAmt||0).toFixed(2)} &nbsp;|&nbsp; ⏳ ₹${(s.topayAmt||0).toFixed(2)}</div>
-          <div class="hist-mt" style="font-size:0.66rem;margin-top:1px">⏰ ${s.closedAt?new Date(s.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–'} &nbsp;|&nbsp; 💵 Cash: ₹${(s.cashBalance||(s.net-s.topayAmt)||0).toFixed(2)}</div>
+          <div class="hist-mt" style="font-size:0.66rem;margin-top:1px">⏰ ${s.closedAt?new Date(s.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–'} &nbsp;|&nbsp; 💵 Cash: ₹${(s.cashBalance||(s.net-s.topayAmt)||0).toFixed(0)}${(s.loadingCharges||0)>0?' &nbsp;|&nbsp; 🏋️ LC: ₹'+(s.loadingCharges).toFixed(0):''}</div>
         </div>
         <div class="hist-r" onclick="openHistDet(${i})">
           <div class="hist-net">₹${(s.net||0).toFixed(2)}</div>
@@ -1271,7 +1323,7 @@ function refreshHistDet() {
   const s    = currentHistSess;
   if (!s) return;
   const ents = s.entries||[];
-  const t    = calcTotals(ents);
+  const t    = calcTotals(ents, s.loadingCharges||0);
   const ct   = s.closedAt?new Date(s.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–';
   document.getElementById('histMeta').innerHTML  = `<span>📅 ${s.date}</span><span>📦 ${ents.length} Entries</span><span>⏰ Closed: ${ct}</span>`;
   document.getElementById('histBadge').innerHTML = `${ents.length}<br><span style="font-size:0.61rem;opacity:0.8">entries</span>`;
@@ -1338,7 +1390,7 @@ window.histDelEnt = async idx => {
 };
 
 async function saveHistFS(newEnts) {
-  const t      = calcTotals(newEnts);
+  const t      = calcTotals(newEnts, currentHistSess.loadingCharges||0);
   const docId  = currentHistSess.histId||currentHistSess.dateKey;
   const upd    = {...currentHistSess, entries:newEnts, count:newEnts.length,
     paidAmt:t.paidAmt, topayAmt:t.topayAmt, gross:t.gross,
@@ -1368,7 +1420,7 @@ window.printHistDet = () => {
 };
 
 function buildPrint(sess, ents, isCurrent) {
-  const t  = calcTotals(ents);
+  const t  = calcTotals(ents, sess.loadingCharges||0);
   const ct = isCurrent
     ? new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
     : (sess.closedAt?new Date(sess.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–');
@@ -1425,9 +1477,10 @@ function buildPrint(sess, ents, isCurrent) {
   </div>
   <div class="cb">
     <div class="cr b"><span class="cl">Gross Total (Paid + To Pay)</span><span class="cv">₹${t.gross.toFixed(2)}</span></div>
-    <div class="cr r"><span class="cl">Commission (20% on Gross)</span><span class="cv">– ₹${t.commission.toFixed(2)}</span></div>
+    <div class="cr r"><span class="cl">Commission (20% on Gross) <em style="font-size:8px">(rounded)</em></span><span class="cv">– ₹${t.commission.toFixed(0)}</span></div>
     <div class="cr g"><span class="cl">NET AMOUNT</span><span class="cv">₹${t.net.toFixed(2)}</span></div>
-    <div class="cr p"><span class="cl">Cash Balance (Net − To Pay)</span><span class="cv">₹${t.cashBalance.toFixed(2)}</span></div>
+    ${t.loadingCharges>0?`<div class="cr" style="background:#f5f3ff;-webkit-print-color-adjust:exact;print-color-adjust:exact"><span class="cl" style="color:#7c3aed">Loading Charges</span><span class="cv" style="color:#7c3aed">– ₹${t.loadingCharges.toFixed(2)}</span></div>`:''}
+    <div class="cr p"><span class="cl">Cash Balance (Net − ToPay${t.loadingCharges>0?' − Loading':''}) <em style="font-size:8px">(rounded)</em></span><span class="cv">₹${t.cashBalance.toFixed(0)}</span></div>
   </div>
   <div class="ft">Generated by ANS Travels Parcel Booking System &nbsp;|&nbsp; ${new Date().toLocaleString('en-IN')} &nbsp;|&nbsp; User: ${currentUser?.username||'–'}</div>`;
 }
