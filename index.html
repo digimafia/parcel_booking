@@ -134,6 +134,7 @@ table.etbl tr:hover{background:#fafbff}
 .td-lr{font-weight:700;font-size:0.75rem;color:var(--accent)}
 .td-nm{font-weight:600;font-size:0.78rem}
 .td-sb{font-size:0.64rem;color:var(--muted);margin-top:1px}
+.td-note{font-size:0.63rem;color:#92400e;background:#fefce8;border:1px solid #fde68a;border-radius:4px;padding:2px 6px;margin-top:3px;display:inline-block;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tag{padding:2px 7px;border-radius:20px;font-size:0.62rem;font-weight:600;white-space:nowrap}
 .tg-p{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
 .tg-t{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
@@ -1382,7 +1383,7 @@ function renderEntries() {
     <tr>
       <td style="color:#aaa;font-size:0.63rem">${filt.length-i}</td>
       <td><span class="td-lr">${h(e.lr||'–')}</span></td>
-      <td><div class="td-nm">${h(e.name)}</div><div class="td-sb">📱 ${h(e.mobile)}</div></td>
+      <td><div class="td-nm">${h(e.name)}</div><div class="td-sb">📱 ${h(e.mobile)}</div>${e.note?`<div class="td-note">📝 ${h(e.note)}</div>`:''}</td>
       <td style="font-size:0.72rem">${h(e.vehicle)}</td>
       <td style="font-size:0.71rem">${h(e.item||'–')}</td>
       <td style="font-size:0.71rem">${h(e.bookedBy||'–')}</td>
@@ -1450,7 +1451,7 @@ function buildRows(ents, withAct, withDeliver, ctx) {
     return `<tr>
       <td style="color:#aaa;font-size:0.63rem">${i+1}</td>
       <td class="r-lr">${h(e.lr||'–')}</td>
-      <td><div class="r-nm">${h(e.name)}</div><div class="r-sb">${h(e.mobile)}</div></td>
+      <td><div class="r-nm">${h(e.name)}</div><div class="r-sb">📱 ${h(e.mobile)}</div>${e.note?`<div class="td-note" style="max-width:140px">📝 ${h(e.note)}</div>`:''}</td>
       <td style="font-size:0.7rem;color:var(--muted)">${h(e.vehicle)}</td>
       <td style="font-size:0.7rem">${h(e.item||'–')}</td>
       <td style="font-size:0.7rem">${h(e.bookedBy||'–')}</td>
