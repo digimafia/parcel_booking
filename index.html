@@ -96,9 +96,10 @@ textarea{resize:vertical;min-height:58px}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .lr-col{display:grid;grid-template-columns:110px 1fr;gap:10px}
 .pay-toggle{display:flex;gap:8px}
-.pay-opt{flex:1;padding:8px;border:2px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;font-weight:600;font-size:0.82rem;transition:all 0.2s;background:#f8fafc;color:var(--muted);user-select:none}
-.pay-opt.sel-paid{border-color:var(--green);color:var(--green);background:#f0fdf4}
-.pay-opt.sel-topay{border-color:#f97316;color:#f97316;background:#fff7ed}
+.pay-opt{flex:1;padding:8px;border:2px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;font-weight:600;font-size:0.82rem;transition:all 0.2s;background:#f0f4f8;color:#475569;user-select:none}
+.pay-opt.sel-paid{border-color:#057a55;color:#fff;background:#057a55}
+.pay-opt.sel-topay{border-color:#c2410c;color:#fff;background:#c2410c}
+.pay-opt.sel-credit{border-color:#92400e;color:#fff;background:#92400e}
 .bookedby-wrap{display:flex;gap:6px;align-items:center}
 .bookedby-wrap select{flex:1}
 .btn-mgr{padding:8px 11px;background:#eff6ff;border:1.5px solid #bfdbfe;color:var(--accent);border-radius:8px;font-size:0.7rem;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Poppins',sans-serif;flex-shrink:0}
@@ -123,8 +124,8 @@ textarea{resize:vertical;min-height:58px}
 .fbtn.fa{border-color:var(--accent);color:var(--accent);background:#eff6ff}
 .fbtn.fp{border-color:var(--green);color:var(--green);background:#f0fdf4}
 .fbtn.ft{border-color:#f97316;color:#f97316;background:#fff7ed}
-.ent-wrap{overflow-x:auto}
-table.etbl{width:100%;border-collapse:collapse;font-size:0.74rem;min-width:480px}
+.ent-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.etbl{width:100%;border-collapse:collapse;font-size:0.74rem;min-width:500px}
 table.etbl thead tr{background:#f8fafc}
 table.etbl th{padding:7px 8px;text-align:left;font-size:0.62rem;color:var(--muted);text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
 table.etbl td{padding:7px 8px;border-bottom:1px solid #f0f4f8;color:var(--text);vertical-align:middle}
@@ -274,6 +275,21 @@ table.rtbl tr:nth-child(even){background:#fafbff}
 .psc-btns{display:flex;gap:8px}
 .btn-psc-wa{flex:1;padding:10px;background:#25d366;border:none;color:#fff;border-radius:9px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
 .btn-psc-pr{flex:1;padding:10px;background:#fff;border:1.5px solid var(--accent);color:var(--accent);border-radius:9px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+
+
+/* MOBILE REPORT TABLE — horizontal scroll, nothing hidden */
+.r-twrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px}
+@media(max-width:640px){
+  table.rtbl{min-width:560px}
+  table.rtbl th{font-size:0.6rem;padding:6px 5px;white-space:nowrap}
+  table.rtbl td{font-size:0.68rem;padding:6px 5px}
+  .r-nm{font-size:0.7rem}.r-sb{font-size:0.61rem}
+  .r-lr{font-size:0.72rem}
+  /* Touch-friendly action buttons */
+  .act-btn{min-width:32px;min-height:32px;font-size:0.72rem!important;padding:6px 8px!important;touch-action:manipulation}
+  /* Scroll hint shadow on right edge */
+  .r-twrap::after{content:'';position:sticky;right:0;top:0;width:18px;height:100%;background:linear-gradient(to right,transparent,rgba(0,0,0,0.06));pointer-events:none;flex-shrink:0}
+}
 
 /* TOAST */
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);border-radius:24px;padding:9px 18px;font-size:0.78rem;font-weight:600;color:#fff;z-index:999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:var(--shadow-md)}
@@ -426,14 +442,7 @@ table.rtbl tr:nth-child(even){background:#fafbff}
         <label class="form-lbl">Note</label>
         <textarea id="fNote" placeholder="Any special instructions…" rows="2"></textarea>
       </div>
-      <div class="form-row">
-        <label class="form-lbl">Delivery Status</label>
-        <div class="pay-toggle">
-          <div class="pay-opt" id="optPend" onclick="selStatus('Pending')" style="border-color:#f59e0b;color:#f59e0b;background:#fffbeb">🕐 Pending</div>
-          <div class="pay-opt sel-paid" id="optDone" onclick="selStatus('Delivered')" style="">📬 Delivered</div>
-        </div>
-        <input type="hidden" id="fStatus" value="Delivered">
-      </div>
+      <input type="hidden" id="fStatus" value="Pending">
       <input type="hidden" id="fEditId" value="">
       <button class="btn-add" id="btnAdd" onclick="previewEntry()">👁 Review &amp; Add Entry</button>
       <button class="btn-cancel-edit" id="btnCancelEdit" onclick="cancelEdit()" style="display:none">✕ Cancel Edit</button>
@@ -614,7 +623,7 @@ table.rtbl tr:nth-child(even){background:#fafbff}
     <div class="rpt-body">
       <div class="rpt-lbl">Entry Details</div>
       <div class="r-twrap">
-        <table class="rtbl"><thead><tr><th>#</th><th>LR</th><th>Name/Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type</th><th style="text-align:right">Amount</th></tr></thead>
+        <table class="rtbl"><thead><tr><th>#</th><th>LR</th><th>Name/Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type</th><th style="text-align:right">Amount</th><th id="rptActTh" style="display:none">Act</th></tr></thead>
         <tbody id="rptBody"></tbody></table>
       </div>
       <div class="summ-grid" id="rptSumm"></div>
@@ -642,6 +651,9 @@ table.rtbl tr:nth-child(even){background:#fafbff}
       </div>
       <div class="rpt-meta" id="histMeta"></div>
     </div>
+    <div style="display:none;padding:7px 16px;background:#f0fdf4;border-bottom:1px solid #bbf7d0;font-size:0.73rem;color:#166534;align-items:center;gap:6px" id="staffBar">
+      <span>📬 Tap the Delivered button to confirm parcel delivery</span>
+    </div>
     <div class="admin-bar" id="adminBar" style="justify-content:space-between">
       <span>👑 Admin — tap ✏️ / ✕ to edit or delete</span>
       <button onclick="openHistNewEntry()" style="padding:5px 11px;background:#1a56db;color:#fff;border:none;border-radius:7px;font-family:Poppins,sans-serif;font-size:0.73rem;font-weight:600;cursor:pointer;white-space:nowrap">+ New Entry</button>
@@ -649,7 +661,7 @@ table.rtbl tr:nth-child(even){background:#fafbff}
     <div class="rpt-body">
       <div class="rpt-lbl">Entry Details</div>
       <div class="r-twrap">
-        <table class="rtbl"><thead><tr><th>#</th><th>LR</th><th>Name/Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type/Status</th><th style="text-align:right">Amount</th><th id="actTh" style="display:none">Act</th></tr></thead>
+        <table class="rtbl"><thead><tr><th>#</th><th>LR</th><th>Name/Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type/Status</th><th style="text-align:right">Amount</th><th id="actTh" style="white-space:nowrap">Actions</th></tr></thead>
         <tbody id="histDetBody"></tbody></table>
       </div>
       <div class="summ-grid" id="histSumm"></div>
@@ -866,7 +878,7 @@ function launchApp() {
   const badge = document.getElementById('userBadge');
   const btn   = document.getElementById('btnExit');
   if (currentUser.role==='admin') {
-    badge.textContent = '👑 Admin';
+    badge.textContent = '👑 Admin · BREAD';
     badge.className   = 'user-badge admin-badge';
     btn.textContent   = 'Logout';
   } else {
@@ -1043,7 +1055,7 @@ window.doConfirmClose = async () => {
       entries:entries.map(e=>({
         lr:e.lr,name:e.name,mobile:e.mobile,vehicle:e.vehicle,
         amount:e.amount,payType:e.payType,time:e.time||'',
-        item:e.item||'',bookedBy:e.bookedBy||'',note:e.note||'',creditPending:!!e.creditPending,status:e.status||'Delivered'
+        item:e.item||'',bookedBy:e.bookedBy||'',note:e.note||'',creditPending:!!e.creditPending,status:e.status||'Pending'
       }))
     });
     const batch = db.batch();
@@ -1057,34 +1069,24 @@ window.doConfirmClose = async () => {
 
 // ══ DELIVERY STATUS TOGGLE ════════════════════════════
 window.selStatus = type => {
-  document.getElementById('fStatus').value   = type;
-  document.getElementById('optPend').className = 'pay-opt'+(type==='Pending'  ?' sel-topay':'');
-  document.getElementById('optDone').className = 'pay-opt'+(type==='Delivered'?' sel-paid':'');
-  // override styles inline for yellow
-  if(type==='Pending'){
-    document.getElementById('optPend').style.cssText='border-color:#f59e0b;color:#f59e0b;background:#fffbeb';
-    document.getElementById('optDone').style.cssText='';
-  } else {
-    document.getElementById('optPend').style.cssText='';
-    document.getElementById('optDone').style.cssText='border-color:var(--green);color:var(--green);background:#f0fdf4';
-  }
+  const fs = document.getElementById('fStatus');
+  if (fs) fs.value = type;
+  // optPend/optDone removed from booking form; safe no-op if absent
+  const op = document.getElementById('optPend');
+  const od = document.getElementById('optDone');
+  if(op) op.className = 'pay-opt'+(type==='Pending'?' sel-topay':'');
+  if(od) od.className = 'pay-opt'+(type==='Delivered'?' sel-paid':'');
 };
-// init delivered as default
-selStatus('Delivered');
 
 // ══ PAY TOGGLE ════════════════════════════════════════
 window.selPay = type => {
   document.getElementById('fPayType').value     = type;
   document.getElementById('optPaid').className   = 'pay-opt'+(type==='Paid'          ?' sel-paid':'');
   document.getElementById('optTopay').className  = 'pay-opt'+(type==='ToPay'         ?' sel-topay':'');
-  document.getElementById('optCredit').className = 'pay-opt'+(type==='CreditPending' ?' sel-topay':'');
+  document.getElementById('optCredit').className = 'pay-opt'+(type==='CreditPending' ?' sel-credit':'');
   // reset inline styles
   const c = document.getElementById('optCredit');
-  if (type==='CreditPending') {
-    c.style.cssText='flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;background:#fffbeb;font-size:0.76rem';
-  } else {
-    c.style.cssText='flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;font-size:0.76rem';
-  }
+  c.style.cssText='flex:1 1 100%;font-size:0.76rem';
 };
 
 // ══ ENTRY PREVIEW ═════════════════════════════════════
@@ -1144,7 +1146,7 @@ function sendReceiptWA(d) {
     `━━━━━━━━━━━━━━━━━━━━━\n`+
     `💰 *Amount:* ₹${parseFloat(d.amount).toFixed(2)}\n`+
     `💳 *Payment:* ${d.payType==='Paid'?'✅ Paid':'⏳ To Pay'}\n`+
-    `🚚 *Delivery:* ${(d.status||'Delivered')==='Pending'?'🕐 Pending':'📬 Delivered'}\n`+
+    `🚚 *Delivery:* ${(d.status||'Pending')==='Pending'?'🕐 Pending':'📬 Delivered'}\n`+
     `${d.note?'📝 *Note:* '+d.note+'\n':''}`+
     `━━━━━━━━━━━━━━━━━━━━━\n`+
     `_Thank you for choosing ANS Travels!_\n`+
@@ -1184,7 +1186,7 @@ function printSingleReceipt(d) {
   ${d.note?'<div class="rrow"><span class="rl">Note</span><span class="rv">'+h(d.note)+'</span></div>':''}
   <div class="ramt">₹${parseFloat(d.amount).toFixed(2)}</div>
   <div class="rpay ${d.payType==='Paid'?'rp':'rt'}">${d.payType==='Paid'?'✅ PAID':'⏳ TO PAY'}</div>
-  <div class="rst ${(d.status||'Delivered')==='Pending'?'rst-p':'rst-d'}">${(d.status||'Delivered')==='Pending'?'🕐 PENDING DELIVERY':'📬 DELIVERED'}</div>
+  <div class="rst ${(d.status||'Pending')==='Pending'?'rst-p':'rst-d'}">${(d.status||'Pending')==='Pending'?'🕐 PENDING DELIVERY':'📬 DELIVERED'}</div>
   <div class="rft">Thank you for choosing ANS Travels!<br>Keep this receipt for reference.</div>`;
   window.print();
 }
@@ -1214,21 +1216,21 @@ window.submitEntry = async () => {
   btn.disabled = true;
   try {
     if (editId) {
-      await db.doc('session/today/entries/'+editId).update({lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status:status||'Delivered',creditPending:payType==='CreditPending'});
+      await db.doc('session/today/entries/'+editId).update({lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status:status||'Pending',creditPending:payType==='CreditPending'});
       toast('Entry updated ✅','success');
       cancelEdit();
     } else {
       if (entries.find(e=>e.lr===lr)){ toast('LR No. already exists!','error'); btn.disabled=false; return; }
       const now = new Date();
       await db.collection('session/today/entries').add({
-        lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status:status||'Delivered',
+        lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status:status||'Pending',
         creditPending: payType==='CreditPending',
         ts:now.getTime(),
         time:now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
       });
       toast('Entry added ✅','success');
       clearForm();
-      showPostSaveCard({lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status:status||'Delivered'});
+      showPostSaveCard({lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status:status||'Pending'});
     }
   } catch(e){ toast('Error: '+e.message,'error'); }
   btn.disabled = false;
@@ -1248,7 +1250,7 @@ window.editEntry = fid => {
   document.getElementById('fNote').value     = e.note||'';
   document.getElementById('fEditId').value   = e._id;
   selPay(e.payType);
-  selStatus(e.status||'Delivered');
+  const fsEl = document.getElementById('fStatus'); if(fsEl) fsEl.value = e.status||'Pending';
   document.getElementById('formTitle').textContent = '✏️ Edit Entry — '+e.lr;
   document.getElementById('btnAdd').textContent    = '👁 Review & Update';
   document.getElementById('btnAdd').className      = 'btn-add upd';
@@ -1263,7 +1265,6 @@ window.cancelEdit = () => {
   document.getElementById('btnAdd').className      = 'btn-add';
   document.getElementById('btnCancelEdit').style.display = 'none';
   clearForm();
-  selStatus('Delivered');
 };
 
 window.deleteEntry = async fid => {
@@ -1364,7 +1365,7 @@ function renderEntries() {
   if (currentFilter==='paid')      filt = filt.filter(e=>e.payType==='Paid');
   if (currentFilter==='topay')     filt = filt.filter(e=>e.payType==='ToPay');
   if (currentFilter==='pending')   filt = filt.filter(e=>e.status==='Pending');
-  if (currentFilter==='delivered') filt = filt.filter(e=>e.status==='Delivered'||!e.status);
+  if (currentFilter==='delivered') filt = filt.filter(e=>e.status==='Delivered');
   if (currentFilter==='credit')    filt = filt.filter(e=>e.payType==='CreditPending');
   if (q) filt = filt.filter(e=>
     (e.lr||'').toLowerCase().includes(q)||
@@ -1387,12 +1388,12 @@ function renderEntries() {
       <td style="font-size:0.71rem">${h(e.bookedBy||'–')}</td>
       <td>
         <span class="tag ${e.payType==='CreditPending'?'tg-credit':e.payType==='Paid'?'tg-p':'tg-t'}" style="font-size:0.63rem">${e.payType==='CreditPending'?'💳 Credit':e.payType==='Paid'?'Paid':'ToPay'}</span>
-        <span class="tag ${(e.status||'Delivered')==='Pending'?'tg-pend':'tg-done'}" style="margin-top:3px;display:block">${(e.status||'Delivered')==='Pending'?'🕐':'📬'}</span>
+        <span class="tag ${(e.status||'Pending')==='Pending'?'tg-pend':'tg-done'}" style="margin-top:3px;display:block">${(e.status||'Pending')==='Pending'?'🕐':'📬'}</span>
       </td>
       <td style="font-weight:700;white-space:nowrap;font-size:0.82rem">₹${parseFloat(e.amount||0).toFixed(2)}</td>
       <td><div class="act-btns">
         <button class="act-btn" onclick="sendEntryWAById('${e._id}')" title="WhatsApp" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534">📲</button>
-        ${(e.status||'Delivered')==='Pending'?`<button class="act-btn" onclick="markDelivered('${e._id}')" title="Mark Delivered" style="background:#fffbeb;border-color:#fcd34d;color:#92400e">📬</button>`:''}
+        ${(e.status||'Pending')==='Pending'?`<button class="act-btn" onclick="markDelivered('${e._id}')" title="Mark Delivered" style="background:#fffbeb;border-color:#fcd34d;color:#92400e">📬</button>`:''}
         <button class="act-btn edit" onclick="editEntry('${e._id}')">✏️</button>
         ${isAdmin?`<button class="act-btn del" onclick="deleteEntry('${e._id}')">✕</button>`:''}
       </div></td>
@@ -1432,14 +1433,20 @@ function renderReport(sess, ents, isLive) {
     : (sess.closedAt?new Date(sess.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–');
   document.getElementById('rptMeta').innerHTML  = `<span>📅 ${sess.date}</span><span>📦 ${ents.length} Entries</span><span>⏰ ${tm}</span>`;
   document.getElementById('rptBadge').innerHTML = `${ents.length}<br><span style="font-size:0.61rem;opacity:0.8">entries</span>`;
-  document.getElementById('rptBody').innerHTML  = buildRows(ents,false);
+  const _isAdmin = currentUser&&currentUser.role==='admin';
+  const _rptActTh = document.getElementById('rptActTh');
+  if (_rptActTh) _rptActTh.style.display = _isAdmin ? '' : 'none';
+  document.getElementById('rptBody').innerHTML  = buildRows(ents, _isAdmin, _isAdmin, 'live');
   document.getElementById('rptSumm').innerHTML  = summGrid(t);
   document.getElementById('rptCalc').innerHTML  = calcBlk(t);
 }
 
-function buildRows(ents, withAct) {
+let _buildRowsCtx = 'hist'; // 'hist' or 'live'
+function buildRows(ents, withAct, withDeliver, ctx) {
+  _buildRowsCtx = ctx || 'hist';
   return [...ents].reverse().map((e,i)=>{
     const oi = ents.length-1-i;
+    const isPending = (e.status||'Pending')==='Pending';
     return `<tr>
       <td style="color:#aaa;font-size:0.63rem">${i+1}</td>
       <td class="r-lr">${h(e.lr||'–')}</td>
@@ -1449,10 +1456,16 @@ function buildRows(ents, withAct) {
       <td style="font-size:0.7rem">${h(e.bookedBy||'–')}</td>
       <td>
         <span class="tag ${e.payType==='CreditPending'?'tg-credit':e.payType==='Paid'?'tg-p':'tg-t'}" style="font-size:0.59rem">${e.payType==='CreditPending'?'💳Credit':e.payType==='Paid'?'Paid':'ToPay'}</span>
-        <span class="tag ${(e.status||'Delivered')==='Pending'?'tg-pend':'tg-done'}" style="font-size:0.59rem;margin-top:2px;display:block">${(e.status||'Delivered')==='Pending'?'🕐Pending':'📬Done'}</span>
+        <span class="tag ${(e.status||'Pending')==='Pending'?'tg-pend':'tg-done'}" style="font-size:0.59rem;margin-top:2px;display:block">${(e.status||'Pending')==='Pending'?'🕐Pending':'📬Done'}</span>
       </td>
       <td class="r-am" style="text-align:right">₹${parseFloat(e.amount||0).toFixed(2)}</td>
-      ${withAct?`<td><div class="act-btns"><button class="act-btn edit" onclick="histEditEnt(${oi})">✏️</button><button class="act-btn del" onclick="histDelEnt(${oi})">✕</button></div></td>`:''}
+      <td style="white-space:nowrap">
+        <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-start">
+          ${isPending&&withDeliver?`<button class="act-btn" onclick="histMarkDelivered(${oi})" title="Mark Delivered" style="background:#fffbeb;border-color:#fcd34d;color:#92400e;font-size:0.68rem;padding:3px 7px;width:100%">📬 Delivered</button>`:''}
+          ${withAct?`<div style="display:flex;gap:3px"><button class="act-btn edit" onclick="${_buildRowsCtx==='live'?'rptEditEnt':'histEditEnt'}(${oi})" title="Edit" style="padding:3px 8px">✏️</button><button class="act-btn del" onclick="${_buildRowsCtx==='live'?'rptDelEnt':'histDelEnt'}(${oi})" title="Delete" style="padding:3px 8px">✕</button></div>`:''}
+          ${!isPending&&!withAct&&!withDeliver?'<span style="font-size:0.65rem;color:#aaa">–</span>':''}
+        </div>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -1571,7 +1584,7 @@ function renderHistList() {
       matches.map(({e,s,si})=>{
         const payColor = e.payType==='Paid'?'green':'topay';
         const pendBadge = e.creditPending?'<span class="srch-pending-badge">💳 Credit Pending</span>':'';
-        const stBadge = (e.status||'Delivered')==='Pending'?'<span class="tag tg-pend" style="font-size:0.6rem;margin-left:4px">🕐 Pending</span>':'';
+        const stBadge = (e.status||'Pending')==='Pending'?'<span class="tag tg-pend" style="font-size:0.6rem;margin-left:4px">🕐 Pending</span>':'';
         return `<div class="srch-result-card">
           <div class="srch-entry-row">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
@@ -1713,6 +1726,31 @@ window.reopenSession = async () => {
   } catch(err) { toast('Error: '+err.message, 'error'); }
 };
 
+
+// ── Admin edit/delete from live session report overlay ──
+window.rptEditEnt = idx => {
+  // entries array is reversed in buildRows, so original idx = entries.length-1-reversedIdx
+  const e = entries[idx];
+  if (!e) return;
+  // Reuse the live editEntry which loads the form
+  closeReport();
+  editEntry(e._id);
+};
+
+window.rptDelEnt = async idx => {
+  const e = entries[idx];
+  if (!e) return;
+  if (!confirm(`Delete entry "${e.lr} – ${e.name}"? This cannot be undone.`)) return;
+  try {
+    await db.doc('session/today/entries/'+e._id).delete();
+    toast('Entry deleted','success');
+    // Refresh report overlay if still open
+    if (document.getElementById('reportOverlay').classList.contains('show')) {
+      renderReport(session, entries, true);
+    }
+  } catch(err){ toast('Error: '+err.message,'error'); }
+};
+
 window.openHistDet = idx => {
   currentHistSess = histSessions[idx];
   refreshHistDet();
@@ -1729,15 +1767,42 @@ function refreshHistDet() {
   document.getElementById('histBadge').innerHTML = `${ents.length}<br><span style="font-size:0.61rem;opacity:0.8">entries</span>`;
   const isAdmin = currentUser&&currentUser.role==='admin';
   document.getElementById('adminBar').style.display    = isAdmin?'flex':'none';
-  document.getElementById('actTh').style.display       = isAdmin?'':'none';
+  document.getElementById('staffBar').style.display     = isAdmin?'none':'flex';
+  document.getElementById('actTh').style.display       = '';
   document.getElementById('btnReopenSess').style.display = isAdmin?'inline-block':'none';
-  document.getElementById('histDetBody').innerHTML   = buildRows(ents,isAdmin);
+  document.getElementById('histDetBody').innerHTML   = buildRows(ents, isAdmin, true);
   document.getElementById('histSumm').innerHTML      = summGrid(t);
   document.getElementById('histCalc').innerHTML      = calcBlk(t);
   fillBookedByDropdowns();
 }
 
 window.closeHistDet = () => document.getElementById('histDetOverlay').classList.remove('show');
+
+window.histMarkDelivered = async idx => {
+  // Context-aware: works for both history overlay and live session report overlay
+  if (_buildRowsCtx === 'live') {
+    // Live session entry
+    const e = entries[idx];
+    if (!e) return;
+    if (!confirm(`Confirm delivery for "${e.name}" (${e.lr})?`)) return;
+    try {
+      await db.doc('session/today/entries/'+e._id).update({ status:'Delivered' });
+      toast('Marked as Delivered 📬','success');
+    } catch(err){ toast('Error: '+err.message,'error'); }
+    return;
+  }
+  // History session entry
+  if (!currentHistSess) return;
+  const ents = currentHistSess.entries||[];
+  const e = ents[idx];
+  if (!e) return;
+  if (!confirm(`Confirm delivery for "${e.name}" (${e.lr})?`)) return;
+  const newEnts = ents.map((en,i) => i===idx ? {...en, status:'Delivered'} : en);
+  await saveHistFS(newEnts);
+  toast('Marked as Delivered 📬','success');
+};
+
+
 
 // ── New Entry in closed history session (Admin only) ──
 window.openHistNewEntry = () => {
@@ -1759,11 +1824,9 @@ window.hnSelPay = type => {
   document.getElementById('hnPay').value      = type;
   document.getElementById('hnOptP').className  = 'pay-opt'+(type==='Paid'          ?' sel-paid':'');
   document.getElementById('hnOptT').className  = 'pay-opt'+(type==='ToPay'         ?' sel-topay':'');
-  document.getElementById('hnOptCr').className = 'pay-opt'+(type==='CreditPending' ?' sel-topay':'');
+  document.getElementById('hnOptCr').className = 'pay-opt'+(type==='CreditPending' ?' sel-credit':'');
   const cr = document.getElementById('hnOptCr');
-  cr.style.cssText = type==='CreditPending'
-    ? 'flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;background:#fffbeb;font-size:0.76rem'
-    : 'flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;font-size:0.76rem';
+  cr.style.cssText='flex:1 1 100%;font-size:0.76rem';
 };
 
 window.hnSelStatus = type => {
@@ -1837,11 +1900,9 @@ window.heSelPay = type => {
   document.getElementById('hePay').value      = type;
   document.getElementById('heOptP').className  = 'pay-opt'+(type==='Paid'          ?' sel-paid':'');
   document.getElementById('heOptT').className  = 'pay-opt'+(type==='ToPay'         ?' sel-topay':'');
-  document.getElementById('heOptCr').className = 'pay-opt'+(type==='CreditPending' ?' sel-topay':'');
+  document.getElementById('heOptCr').className = 'pay-opt'+(type==='CreditPending' ?' sel-credit':'');
   const c = document.getElementById('heOptCr');
-  c.style.cssText = type==='CreditPending'
-    ?'flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;background:#fffbeb;font-size:0.76rem'
-    :'flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;font-size:0.76rem';
+  c.style.cssText='flex:1 1 100%;font-size:0.76rem';
 };
 
 window.saveHistEntry = async () => {
