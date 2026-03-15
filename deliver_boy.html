@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ANS Travels – Delivery App</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4f8;--surface:#fff;--border:#dde3ec;
+  --accent:#1a56db;--green:#059669;--red:#e02424;--orange:#d97706;
+  --text:#1a2035;--muted:#6b7a99;--light:#e8edf5;
+  --shadow:0 2px 8px rgba(26,32,53,0.09);--shadow-md:0 4px 20px rgba(26,32,53,0.14);
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;background:linear-gradient(145deg,#0e3fa3,#1a56db,#1e66f5);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:opacity 0.4s}
+.s-icon{font-size:3.8rem;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.3))}
+.s-title{font-family:'Playfair Display',serif;font-size:1.7rem;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.2)}
+.s-sub{font-size:0.77rem;color:rgba(255,255,255,0.7);letter-spacing:1.2px;text-transform:uppercase}
+.s-loader{width:44px;height:4px;background:rgba(255,255,255,0.25);border-radius:99px;margin-top:24px;overflow:hidden}
+.s-bar{height:100%;width:0;background:#fff;border-radius:99px;animation:loadbar 1.6s ease forwards}
+@keyframes loadbar{to{width:100%}}
+
+/* HEADER */
+.header{background:#fff;border-bottom:3px solid var(--accent);padding:0 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;height:54px;box-shadow:var(--shadow)}
+.hdr-brand{display:flex;align-items:center;gap:8px}
+.hdr-icon{font-size:1.4rem}
+.hdr-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--accent);line-height:1.1}
+.hdr-title small{display:block;font-family:'Poppins',sans-serif;font-size:0.58rem;color:var(--muted)}
+.hdr-right{display:flex;align-items:center;gap:6px}
+.live-chip{background:#f0fdf4;border:1px solid #6ee7b7;border-radius:20px;padding:3px 9px;font-size:0.64rem;font-weight:700;color:var(--green);white-space:nowrap;display:flex;align-items:center;gap:4px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.5)}}
+.btn-refresh{background:#eff6ff;border:1.5px solid #bfdbfe;color:var(--accent);border-radius:9px;padding:7px 12px;font-family:'Poppins',sans-serif;font-size:0.74rem;font-weight:600;cursor:pointer}
+
+/* MAIN */
+.main{max-width:480px;margin:0 auto;padding:14px}
+
+/* LOADING */
+.loading-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:32px;text-align:center;box-shadow:var(--shadow)}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* STATS HEADER */
+.stats-header{background:linear-gradient(135deg,#1a56db,#0e3fa3);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:var(--shadow-md)}
+.sh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh-title{font-size:0.8rem;font-weight:600;opacity:0.85;text-transform:uppercase;letter-spacing:0.6px}
+.sh-live{background:rgba(255,255,255,0.2);border-radius:20px;padding:3px 9px;font-size:0.64rem;font-weight:700;display:flex;align-items:center;gap:4px}
+.sh-dot{width:5px;height:5px;border-radius:50%;background:#4ade80;animation:pulse 1.5s infinite}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.sg-item{background:rgba(255,255,255,0.15);border-radius:8px;padding:8px 6px;text-align:center}
+.sg-val{font-size:1.1rem;font-weight:700;line-height:1}
+.sg-lbl{font-size:0.58rem;opacity:0.8;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:10px}
+.search-wrap input{padding:11px 36px 11px 40px;font-size:0.88rem;border-radius:10px;border:1.5px solid var(--border);background:#fff;width:100%;font-family:'Poppins',sans-serif;color:var(--text)}
+.search-wrap input:focus{outline:none;border-color:var(--accent)}
+.s-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
+.s-clr{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:0.9rem;color:var(--muted);cursor:pointer;padding:4px}
+
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.ftab{padding:6px 13px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:0.72rem;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0}
+.ftab.a-all{border-color:var(--accent);color:var(--accent);background:#eff6ff}
+.ftab.a-pend{border-color:var(--orange);color:var(--orange);background:#fff7ed}
+.ftab.a-done{border-color:var(--green);color:var(--green);background:#f0fdf4}
+.ftab.a-coll{border-color:var(--red);color:var(--red);background:#fef2f2}
+
+/* PARCEL CARDS */
+#parcelList{display:flex;flex-direction:column;gap:10px}
+.parcel-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);transition:border-color 0.2s}
+.parcel-card.delivered{border-color:#bbf7d0;opacity:0.75}
+.card-top{padding:12px 14px 10px;border-bottom:1px solid #f0f4f8}
+.card-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+.card-lr{font-size:1.05rem;font-weight:700;color:var(--accent)}
+.card-sess{font-size:0.6rem;color:var(--muted);margin-top:1px}
+.status-badge{padding:4px 10px;border-radius:20px;font-size:0.67rem;font-weight:700;white-space:nowrap}
+.sb-pend{background:#fff7ed;color:#c2410c;border:1.5px solid #fed7aa}
+.sb-done{background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0}
+.card-name{font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.card-mobile{font-size:0.8rem;color:var(--muted)}
+.card-details{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.cd{background:#f8fafc;border-radius:6px;padding:5px 8px}
+.cd-l{font-size:0.57rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;font-weight:600;margin-bottom:1px}
+.cd-v{font-size:0.74rem;font-weight:600;color:var(--text)}
+.cd.full{grid-column:1/-1}
+/* payment row */
+.card-pay{padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid #f8fafc}
+.pay-tag{padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:700}
+.pt-paid{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.pt-topay{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.pt-credit{background:#fef9c3;color:#92400e;border:1px solid #fde68a}
+.pay-amt{font-size:1.05rem;font-weight:700;color:var(--text)}
+.collect-tag{background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;padding:4px 10px;text-align:center}
+.collect-tag .ct-l{font-size:0.58rem;color:#f87171;font-weight:600;text-transform:uppercase}
+.collect-tag .ct-v{font-size:1rem;font-weight:800;color:var(--red)}
+/* note */
+.card-note{margin:0 14px 8px;padding:7px 10px;background:#fefce8;border:1px solid #fde68a;border-radius:7px;font-size:0.72rem;color:#92400e}
+/* delivery info */
+.card-delinfo{margin:0 14px 8px;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:0.72rem;color:#166534}
+.card-delinfo strong{font-size:0.75rem}
+/* actions */
+.card-action{padding:0 14px 12px}
+.btn-confirm{width:100%;padding:13px;background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:10px;font-family:'Poppins',sans-serif;font-size:0.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all 0.18s;touch-action:manipulation}
+.btn-confirm:active{transform:scale(0.97)}
+.btn-done-label{width:100%;padding:11px;background:#f0fdf4;border:1.5px solid #bbf7d0;color:#166534;border-radius:10px;font-size:0.83rem;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+.card-contact{display:flex;gap:8px;padding:0 14px 12px}
+.btn-contact{flex:1;padding:10px;background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:9px;font-family:'Poppins',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s}
+.btn-contact.wa{border-color:#25d366;color:#059669}
+.btn-contact.ph{border-color:#bfdbfe;color:var(--accent)}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:2.8rem;opacity:0.3;margin-bottom:10px}
+.empty-title{font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.empty-sub{font-size:0.75rem;line-height:1.5}
+
+/* MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(15,20,40,0.6);z-index:400;padding:16px;align-items:center;justify-content:center;overflow-y:auto}
+.modal-ov.show{display:flex}
+.mbox{background:#fff;border-radius:16px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.22);margin:auto}
+.mhd{padding:15px 18px;font-size:0.95rem;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);text-align:center}
+.mbody{padding:16px}
+.mpi{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.mpi-lr{font-size:1.1rem;font-weight:700;color:var(--accent);margin-bottom:3px}
+.mpi-name{font-size:0.9rem;font-weight:600;margin-bottom:2px}
+.mpi-detail{font-size:0.73rem;color:var(--muted)}
+.collect-alert{background:#fef2f2;border:2px solid #fca5a5;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px}
+.ca-lbl{font-size:0.7rem;font-weight:600;color:#ef4444;text-transform:uppercase;margin-bottom:4px}
+.ca-amt{font-size:1.8rem;font-weight:700;color:var(--red);line-height:1}
+.ca-sub{font-size:0.68rem;color:#f87171;margin-top:3px}
+/* form fields */
+.mform-row{margin-bottom:10px}
+.mform-lbl{display:block;font-size:0.68rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px}
+.mform-row input{width:100%;background:#f8fafc;border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-size:0.9rem;font-family:'Poppins',sans-serif;transition:border-color 0.2s}
+.mform-row input:focus{outline:none;border-color:var(--accent);background:#fff}
+.mform-row input::placeholder{color:#aab4c8}
+.mform-req{color:var(--red);font-size:0.7rem;margin-top:3px;display:none}
+.mfoot{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border)}
+.btn-cancel{flex:1;padding:12px;background:#f8fafc;border:1px solid var(--border);color:var(--muted);border-radius:10px;font-family:'Poppins',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer}
+.btn-cfm{flex:2;padding:12px;background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:10px;font-family:'Poppins',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.18s}
+.btn-cfm:disabled{background:#9ca3af;cursor:not-allowed}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);border-radius:24px;padding:10px 20px;font-size:0.8rem;font-weight:600;color:#fff;z-index:999;transition:transform 0.3s;white-space:nowrap;box-shadow:var(--shadow-md)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green)}.toast.error{background:var(--red)}
+
+.footer{text-align:center;padding:20px 16px 32px;font-size:0.67rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="s-icon">🚚</div>
+  <div class="s-title">ANS Travels</div>
+  <div class="s-sub">Delivery App</div>
+  <div class="s-loader"><div class="s-bar"></div></div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="hdr-brand">
+    <span class="hdr-icon">🚚</span>
+    <div class="hdr-title">ANS Travels<small>Delivery Confirmation</small></div>
+  </div>
+  <div class="hdr-right">
+    <div class="live-chip" id="liveChip" style="display:none"><div class="live-dot"></div>LIVE</div>
+    <button class="btn-refresh" onclick="loadAllData()">🔄</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- Loading state -->
+  <div class="loading-card" id="loadingCard">
+    <div class="spinner"></div>
+    <div style="font-size:0.82rem;color:var(--muted);font-weight:500">Loading parcels…</div>
+  </div>
+
+  <!-- Stats header (hidden until data loads) -->
+  <div class="stats-header" id="statsHeader" style="display:none">
+    <div class="sh-top">
+      <div class="sh-title">All Sessions — Parcel Status</div>
+      <div class="sh-live" id="shLive"><div class="sh-dot"></div>LIVE</div>
+    </div>
+    <div class="stats-grid">
+      <div class="sg-item"><div class="sg-val" id="sgTotal">0</div><div class="sg-lbl">Total</div></div>
+      <div class="sg-item"><div class="sg-val" id="sgPend">0</div><div class="sg-lbl">Pending</div></div>
+      <div class="sg-item"><div class="sg-val" id="sgDone">0</div><div class="sg-lbl">Delivered</div></div>
+      <div class="sg-item"><div class="sg-val" id="sgColl">0</div><div class="sg-lbl">Collect ₹</div></div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-wrap" id="searchWrap" style="display:none">
+    <span class="s-ico">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search name, LR, mobile…" oninput="renderParcels()">
+    <button class="s-clr" onclick="document.getElementById('searchInput').value='';renderParcels()">✕</button>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs" id="filterTabs" style="display:none">
+    <button class="ftab a-all"  id="ftAll"   onclick="setTab('all')">All</button>
+    <button class="ftab"        id="ftPend"  onclick="setTab('pending')">🕐 Pending</button>
+    <button class="ftab"        id="ftDone"  onclick="setTab('delivered')">📬 Delivered</button>
+    <button class="ftab"        id="ftColl"  onclick="setTab('collect')">💰 Collect</button>
+  </div>
+
+  <div id="parcelList"></div>
+  <div class="footer">ANS Travels Delivery App • Synced with booking system</div>
+</div>
+
+<!-- CONFIRM DELIVERY MODAL -->
+<div class="modal-ov" id="confirmModal">
+  <div class="mbox">
+    <div class="mhd">📬 Confirm Delivery</div>
+    <div class="mbody">
+      <!-- Parcel info -->
+      <div class="mpi">
+        <div class="mpi-lr" id="mLR">–</div>
+        <div class="mpi-name" id="mName">–</div>
+        <div class="mpi-detail" id="mDetail">–</div>
+      </div>
+      <!-- Collection alert -->
+      <div class="collect-alert" id="collectAlert" style="display:none">
+        <div class="ca-lbl">💰 Collect from Customer</div>
+        <div class="ca-amt" id="mAmt">₹0</div>
+        <div class="ca-sub">Collect this amount before handing the parcel</div>
+      </div>
+      <!-- Delivery By -->
+      <div class="mform-row">
+        <label class="mform-lbl">Delivery By (Your Name) *</label>
+        <input type="text" id="mDeliveryBy" placeholder="Enter delivery person name" autocomplete="off">
+        <div class="mform-req" id="reqDeliveryBy">Please enter delivery person name</div>
+      </div>
+      <!-- Received By -->
+      <div class="mform-row">
+        <label class="mform-lbl">Received By (Customer / Person at door) *</label>
+        <input type="text" id="mReceivedBy" placeholder="Who received the parcel?" autocomplete="off">
+        <div class="mform-req" id="reqReceivedBy">Please enter receiver name</div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-cfm" id="btnCfm" onclick="confirmDelivery()">✅ Confirm Delivered</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:            "AIzaSyC82PfxOQk8XF2oZQ-_OSjUWeJ86UNz4gM",
+  authDomain:        "parcel-booking-84abf.firebaseapp.com",
+  projectId:         "parcel-booking-84abf",
+  storageBucket:     "parcel-booking-84abf.appspot.com",
+  messagingSenderId: "101852597332",
+  appId:             "1:101852597332:web:d99d04f944d111ad1731c1"
+});
+const db = firebase.firestore();
+
+// ── STATE ────────────────────────────────────────────
+// Each parcel: { ...entry fields, _id, _src:'live'|histId, _sessDate, _sessIdx }
+let allParcels      = [];
+let currentTab      = 'pending'; // default to pending view
+let pendingConfirm  = null;
+let _liveUnsub      = null;
+let hasLiveSession  = false;
+
+// ── BOOT ─────────────────────────────────────────────
+setTimeout(() => {
+  const s = document.getElementById('splash');
+  s.style.opacity = '0';
+  setTimeout(() => { s.style.display = 'none'; }, 400);
+  loadAllData();
+}, 1800);
+
+// ── LOAD ALL DATA ─────────────────────────────────────
+// Pulls live session entries + all history entries merged together
+async function loadAllData() {
+  document.getElementById('loadingCard').style.display    = 'block';
+  document.getElementById('statsHeader').style.display    = 'none';
+  document.getElementById('searchWrap').style.display     = 'none';
+  document.getElementById('filterTabs').style.display     = 'none';
+  document.getElementById('parcelList').innerHTML         = '';
+
+  allParcels = [];
+
+  try {
+    // 1. Load all history sessions (up to 200)
+    let histParcels = [];
+    try {
+      const histSnap = await db.collection('history').orderBy('savedAt','desc').limit(200).get();
+      histSnap.docs.forEach(doc => {
+        const s = doc.data();
+        (s.entries||[]).forEach((e,i) => {
+          histParcels.push({
+            ...e,
+            _id:       `${s.histId||s.dateKey}_${i}`,
+            _src:      s.histId||s.dateKey,
+            _histDocId: s.histId||s.dateKey,
+            _histIdx:  i,
+            _sessDate: s.date || s.dateKey,
+            _isClosed: true
+          });
+        });
+      });
+    } catch(e) {
+      // fallback without orderBy
+      const histSnap2 = await db.collection('history').get();
+      histSnap2.docs.forEach(doc => {
+        const s = doc.data();
+        (s.entries||[]).forEach((e,i) => {
+          histParcels.push({
+            ...e,
+            _id: `${s.histId||s.dateKey}_${i}`,
+            _src: s.histId||s.dateKey,
+            _histDocId: s.histId||s.dateKey,
+            _histIdx: i,
+            _sessDate: s.date||s.dateKey,
+            _isClosed: true
+          });
+        });
+      });
+    }
+
+    // 2. Check for live session
+    const sessSnap = await db.doc('session/today').get();
+    hasLiveSession = sessSnap.exists && sessSnap.data().active;
+
+    if (hasLiveSession) {
+      document.getElementById('liveChip').style.display = 'flex';
+      // Set up real-time listener for live entries
+      if (_liveUnsub) _liveUnsub();
+      _liveUnsub = db.collection('session/today/entries').onSnapshot(snap => {
+        const liveSessData = sessSnap.data();
+        // Remove old live entries from allParcels, re-add fresh ones
+        allParcels = allParcels.filter(p => p._src !== 'live');
+        snap.docs.forEach(d => {
+          allParcels.push({
+            ...d.data(),
+            _id:       d.id,
+            _src:      'live',
+            _sessDate: liveSessData.date || 'Today',
+            _isClosed: false
+          });
+        });
+        allParcels.sort((a,b) => {
+          if (a._src==='live' && b._src!=='live') return -1;
+          if (b._src==='live' && a._src!=='live') return 1;
+          return 0;
+        });
+        renderUI();
+      });
+      // While waiting for snapshot, show hist data
+      allParcels = histParcels;
+    } else {
+      document.getElementById('liveChip').style.display = 'none';
+      allParcels = histParcels;
+    }
+
+    document.getElementById('loadingCard').style.display = 'none';
+    renderUI();
+
+  } catch(err) {
+    document.getElementById('loadingCard').innerHTML =
+      `<div style="font-size:1.8rem;margin-bottom:8px">⚠️</div><div style="font-size:0.82rem;color:var(--red)">Error: ${err.message}</div>`;
+  }
+}
+
+// ── RENDER UI ─────────────────────────────────────────
+function renderUI() {
+  const total    = allParcels.length;
+  const pending  = allParcels.filter(e=>(e.status||'Pending')==='Pending').length;
+  const done     = allParcels.filter(e=>e.status==='Delivered').length;
+  const collect  = allParcels.filter(e=>e.payType==='ToPay'||e.payType==='CreditPending').length;
+
+  document.getElementById('statsHeader').style.display = 'block';
+  document.getElementById('searchWrap').style.display  = 'block';
+  document.getElementById('filterTabs').style.display  = 'flex';
+  document.getElementById('loadingCard').style.display = 'none';
+
+  document.getElementById('sgTotal').textContent = total;
+  document.getElementById('sgPend').textContent  = pending;
+  document.getElementById('sgDone').textContent  = done;
+  document.getElementById('sgColl').textContent  = collect;
+
+  document.getElementById('shLive').style.display = hasLiveSession ? 'flex' : 'none';
+
+  // Tab counts
+  document.getElementById('ftAll').textContent  = `All (${total})`;
+  document.getElementById('ftPend').textContent = `🕐 Pending (${pending})`;
+  document.getElementById('ftDone').textContent = `📬 Done (${done})`;
+  document.getElementById('ftColl').textContent = `💰 Collect (${collect})`;
+
+  renderParcels();
+}
+
+// ── RENDER PARCELS ────────────────────────────────────
+function renderParcels() {
+  const q    = (document.getElementById('searchInput')?.value||'').trim().toLowerCase();
+  const list = document.getElementById('parcelList');
+  let filt   = [...allParcels];
+
+  if (currentTab==='pending')   filt = filt.filter(e=>(e.status||'Pending')==='Pending');
+  if (currentTab==='delivered') filt = filt.filter(e=>e.status==='Delivered');
+  if (currentTab==='collect')   filt = filt.filter(e=>e.payType==='ToPay'||e.payType==='CreditPending');
+
+  if (q) filt = filt.filter(e=>
+    (e.lr||'').toLowerCase().includes(q)||
+    (e.name||'').toLowerCase().includes(q)||
+    (e.mobile||'').includes(q)||
+    (e.vehicle||'').toLowerCase().includes(q)
+  );
+
+  if (!filt.length) {
+    const msgs = {
+      pending:   ['🎉','All Delivered!','Every parcel has been confirmed.'],
+      delivered: ['📭','No Deliveries Yet','Confirm parcels to see them here.'],
+      collect:   ['✅','All Clear','No outstanding collections.'],
+      all:       ['🔍','Nothing Found','Try a different search.']
+    };
+    const [icon,title,sub] = msgs[q?'all':currentTab]||msgs.all;
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">${icon}</div><div class="empty-title">${title}</div><div class="empty-sub">${sub}</div></div>`;
+    return;
+  }
+
+  list.innerHTML = filt.map(e => buildCard(e)).join('');
+}
+
+function buildCard(e) {
+  const done        = e.status === 'Delivered';
+  const isPaid      = e.payType === 'Paid';
+  const isToPay     = e.payType === 'ToPay';
+  const isCredit    = e.payType === 'CreditPending';
+  const needsColl   = (isToPay||isCredit);
+  const amt         = parseFloat(e.amount||0);
+  const isLive      = e._src === 'live';
+
+  const payTagCls   = isPaid?'pt-paid':isCredit?'pt-credit':'pt-topay';
+  const payLbl      = isPaid?'✅ Paid':isCredit?'💳 Credit':'⏳ To Pay';
+
+  const collectBox  = needsColl && !done ? `
+    <div class="collect-tag">
+      <div class="ct-l">Collect</div>
+      <div class="ct-v">₹${amt.toFixed(2)}</div>
+    </div>` : '';
+
+  // Delivery confirmation info (if delivered)
+  const delInfo = done && (e.deliveryBy||e.receivedBy) ? `
+    <div class="card-delinfo">
+      ${e.deliveryBy?`<div>🚚 <strong>Delivered by:</strong> ${h(e.deliveryBy)}</div>`:''}
+      ${e.receivedBy?`<div>🤝 <strong>Received by:</strong> ${h(e.receivedBy)}</div>`:''}
+    </div>` : '';
+
+  const noteBox = e.note ? `<div class="card-note">📝 ${h(e.note)}</div>` : '';
+
+  const actionBtn = done
+    ? `<div class="card-action"><div class="btn-done-label">✅ Delivered &amp; Confirmed</div></div>`
+    : `<div class="card-action">
+        <button class="btn-confirm" onclick="openConfirmModal('${e._id}')">
+          📬 Confirm Delivery${needsColl?` — Collect ₹${amt.toFixed(0)}`:''}
+        </button>
+       </div>`;
+
+  const contactRow = !done && e.mobile ? `
+    <div class="card-contact">
+      <a href="https://wa.me/91${(e.mobile||'').replace(/\D/g,'')}" target="_blank" class="btn-contact wa">📲 WhatsApp</a>
+      <a href="tel:${e.mobile}" class="btn-contact ph">📞 Call</a>
+    </div>` : '';
+
+  return `
+  <div class="parcel-card${done?' delivered':''}" id="card_${e._id}">
+    <div class="card-top">
+      <div class="card-hdr">
+        <div>
+          <div class="card-lr">${h(e.lr||'–')}</div>
+          <div class="card-sess">${isLive?'🟢 Live Session':('📅 '+h(e._sessDate||'–'))}</div>
+        </div>
+        <span class="status-badge ${done?'sb-done':'sb-pend'}">${done?'📬 Delivered':'🕐 Pending'}</span>
+      </div>
+      <div class="card-name">${h(e.name||'–')}</div>
+      <div class="card-mobile">📱 ${h(e.mobile||'–')}</div>
+      <div class="card-details">
+        <div class="cd"><div class="cd-l">Vehicle</div><div class="cd-v">${h(e.vehicle||'–')}</div></div>
+        <div class="cd"><div class="cd-l">Item</div><div class="cd-v">${h(e.item||'–')}</div></div>
+        ${e.bookedBy?`<div class="cd full"><div class="cd-l">Booked By</div><div class="cd-v">${h(e.bookedBy)}</div></div>`:''}
+      </div>
+    </div>
+    <div class="card-pay">
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <span class="pay-tag ${payTagCls}">${payLbl}</span>
+        <span class="pay-amt">₹${amt.toFixed(2)}</span>
+      </div>
+      ${collectBox}
+    </div>
+    ${noteBox}
+    ${delInfo}
+    ${actionBtn}
+    ${contactRow}
+  </div>`;
+}
+
+// ── TABS ─────────────────────────────────────────────
+function setTab(tab) {
+  currentTab = tab;
+  document.getElementById('ftAll').className  = 'ftab'+(tab==='all'      ?' a-all':'');
+  document.getElementById('ftPend').className = 'ftab'+(tab==='pending'  ?' a-pend':'');
+  document.getElementById('ftDone').className = 'ftab'+(tab==='delivered'?' a-done':'');
+  document.getElementById('ftColl').className = 'ftab'+(tab==='collect'  ?' a-coll':'');
+  renderParcels();
+}
+
+// ── CONFIRM MODAL ─────────────────────────────────────
+function openConfirmModal(eid) {
+  const e = allParcels.find(x=>x._id===eid);
+  if (!e) return;
+  pendingConfirm = e;
+
+  const amt      = parseFloat(e.amount||0);
+  const needsColl= e.payType==='ToPay'||e.payType==='CreditPending';
+
+  document.getElementById('mLR').textContent     = e.lr||'–';
+  document.getElementById('mName').textContent   = e.name||'–';
+  document.getElementById('mDetail').textContent =
+    `📱 ${e.mobile||'–'}  •  🚛 ${e.vehicle||'–'}${e.item?' • 📦 '+e.item:''}`;
+
+  document.getElementById('collectAlert').style.display = needsColl?'block':'none';
+  document.getElementById('mAmt').textContent = `₹${amt.toFixed(2)}`;
+
+  // Reset fields
+  document.getElementById('mDeliveryBy').value  = '';
+  document.getElementById('mReceivedBy').value  = '';
+  document.getElementById('reqDeliveryBy').style.display = 'none';
+  document.getElementById('reqReceivedBy').style.display = 'none';
+  document.getElementById('btnCfm').disabled    = false;
+  document.getElementById('btnCfm').textContent = '✅ Confirm Delivered';
+
+  document.getElementById('confirmModal').classList.add('show');
+  setTimeout(()=>document.getElementById('mDeliveryBy').focus(), 200);
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('show');
+  pendingConfirm = null;
+}
+
+async function confirmDelivery() {
+  if (!pendingConfirm) return;
+
+  const deliveryBy = document.getElementById('mDeliveryBy').value.trim();
+  const receivedBy = document.getElementById('mReceivedBy').value.trim();
+
+  // Validate
+  let valid = true;
+  if (!deliveryBy) {
+    document.getElementById('reqDeliveryBy').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('reqDeliveryBy').style.display = 'none';
+  }
+  if (!receivedBy) {
+    document.getElementById('reqReceivedBy').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('reqReceivedBy').style.display = 'none';
+  }
+  if (!valid) return;
+
+  const btn = document.getElementById('btnCfm');
+  btn.disabled    = true;
+  btn.textContent = 'Saving…';
+
+  const e         = pendingConfirm;
+  const deliveredAt = new Date().toLocaleString('en-IN');
+
+  try {
+    if (e._src === 'live') {
+      // Live session → update entry doc directly
+      await db.doc('session/today/entries/'+e._id).update({
+        status:      'Delivered',
+        deliveryBy:  deliveryBy,
+        receivedBy:  receivedBy,
+        deliveredAt: deliveredAt
+      });
+      // Update local state
+      const idx = allParcels.findIndex(x=>x._id===e._id);
+      if (idx>=0) Object.assign(allParcels[idx], {status:'Delivered',deliveryBy,receivedBy,deliveredAt});
+
+    } else {
+      // History session → update entries array inside history doc
+      const histSnap = await db.doc('history/'+e._histDocId).get();
+      if (!histSnap.exists) throw new Error('Session not found');
+      const data = histSnap.data();
+      const newEntries = (data.entries||[]).map((en,i) => {
+        if (i === e._histIdx) {
+          return {...en, status:'Delivered', deliveryBy, receivedBy, deliveredAt};
+        }
+        return en;
+      });
+      await db.doc('history/'+e._histDocId).update({ entries: newEntries });
+      // Update local
+      const idx = allParcels.findIndex(x=>x._id===e._id);
+      if (idx>=0) Object.assign(allParcels[idx], {status:'Delivered',deliveryBy,receivedBy,deliveredAt});
+    }
+
+    closeModal();
+    toast(`📬 Delivered! By: ${deliveryBy}, To: ${receivedBy}`, 'success');
+    renderUI();
+
+  } catch(err) {
+    toast('Error: '+err.message, 'error');
+    btn.disabled    = false;
+    btn.textContent = '✅ Confirm Delivered';
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function h(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+let _tt;
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  clearTimeout(_tt); _tt=setTimeout(()=>{t.className='toast '+type;},3500);
+}
+
+// Set default tab to pending on load
+setTab('pending');
+</script>
+</body>
+</html>
