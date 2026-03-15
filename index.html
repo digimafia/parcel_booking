@@ -183,6 +183,7 @@ table.etbl tr:hover{background:#fafbff}
 .btn-rsm{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 11px;font-family:'Poppins',sans-serif;font-size:0.74rem;font-weight:600;cursor:pointer;white-space:nowrap}
 .btn-rwa{background:#25d366;border:none;color:#fff;border-radius:8px;padding:6px 11px;font-family:'Poppins',sans-serif;font-size:0.74rem;font-weight:600;cursor:pointer;white-space:nowrap}
 .btn-rcon{background:var(--green);border:none;color:#fff;border-radius:8px;padding:6px 13px;font-family:'Poppins',sans-serif;font-size:0.74rem;font-weight:600;cursor:pointer}
+.btn-reopen{background:#7c3aed;border:none;color:#fff;border-radius:8px;padding:6px 13px;font-family:'Poppins',sans-serif;font-size:0.74rem;font-weight:600;cursor:pointer;white-space:nowrap}
 .rpt-hdr{background:linear-gradient(135deg,#1a56db,#0e3fa3);padding:19px 22px;color:#fff}
 .rpt-hdr-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
 .rpt-co{font-family:'Playfair Display',serif;font-size:1.2rem}
@@ -631,6 +632,7 @@ table.rtbl tr:nth-child(even){background:#fafbff}
       <div class="rpt-acts">
         <button class="btn-rwa" onclick="sendWA('hist')">📲 WhatsApp</button>
         <button class="btn-rsm" onclick="printHistDet()">🖨 Print</button>
+        <button class="btn-reopen" id="btnReopenSess" onclick="reopenSession()" style="display:none">🔓 Reopen</button>
       </div>
     </div>
     <div class="rpt-hdr">
@@ -640,18 +642,75 @@ table.rtbl tr:nth-child(even){background:#fafbff}
       </div>
       <div class="rpt-meta" id="histMeta"></div>
     </div>
-    <div class="admin-bar" id="adminBar">
-      <span>👑 Admin Mode — tap ✏️ / ✕ on any row to edit or delete</span>
+    <div class="admin-bar" id="adminBar" style="justify-content:space-between">
+      <span>👑 Admin — tap ✏️ / ✕ to edit or delete</span>
+      <button onclick="openHistNewEntry()" style="padding:5px 11px;background:#1a56db;color:#fff;border:none;border-radius:7px;font-family:Poppins,sans-serif;font-size:0.73rem;font-weight:600;cursor:pointer;white-space:nowrap">+ New Entry</button>
     </div>
     <div class="rpt-body">
       <div class="rpt-lbl">Entry Details</div>
       <div class="r-twrap">
-        <table class="rtbl"><thead><tr><th>#</th><th>LR</th><th>Name/Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type</th><th style="text-align:right">Amount</th><th id="actTh" style="display:none">Act</th></tr></thead>
+        <table class="rtbl"><thead><tr><th>#</th><th>LR</th><th>Name/Mobile</th><th>Vehicle</th><th>Item</th><th>Booked By</th><th>Type/Status</th><th style="text-align:right">Amount</th><th id="actTh" style="display:none">Act</th></tr></thead>
         <tbody id="histDetBody"></tbody></table>
       </div>
       <div class="summ-grid" id="histSumm"></div>
       <div class="rpt-lbl">Calculation</div>
       <div class="calc-blk"  id="histCalc"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- History New Entry Modal -->
+<div class="modal-bg" id="histNewEntryModal">
+  <div class="mbox">
+    <div class="mhd">➕ Add New Entry to Session</div>
+    <div class="mbody">
+      <div class="lr-col" style="margin-bottom:10px">
+        <div><label class="form-lbl">LR No.</label><input type="text" id="hnLR" placeholder="LR001" style="text-transform:uppercase"></div>
+        <div><label class="form-lbl">Sender Name</label><input type="text" id="hnName" placeholder="Full name"></div>
+      </div>
+      <div class="two-col" style="margin-bottom:10px">
+        <div><label class="form-lbl">Mobile</label><input type="tel" id="hnMobile" placeholder="10-digit" maxlength="10"></div>
+        <div><label class="form-lbl">Vehicle No.</label><input type="text" id="hnVehicle" placeholder="TN01AB1234" style="text-transform:uppercase"></div>
+      </div>
+      <div class="two-col" style="margin-bottom:10px">
+        <div><label class="form-lbl">Item</label>
+          <select id="hnItem">
+            <option value="">Select…</option>
+            <option>Electronics</option><option>Clothing / Textile</option><option>Documents</option>
+            <option>Furniture</option><option>Auto Parts</option><option>Grocery / Food</option>
+            <option>Medicine / Medical</option><option>Machinery</option><option>Bags / Luggage</option><option>Other</option>
+          </select>
+        </div>
+        <div><label class="form-lbl">Booked By</label><select id="hnBookedBy"></select></div>
+      </div>
+      <div class="two-col" style="margin-bottom:10px">
+        <div><label class="form-lbl">Amount (₹)</label><input type="number" id="hnAmt" placeholder="0.00" min="0"></div>
+        <div><label class="form-lbl">Payment Type</label>
+          <div class="pay-toggle" style="flex-wrap:wrap;gap:4px">
+            <div class="pay-opt sel-paid" id="hnOptP"  onclick="hnSelPay('Paid')" style="flex:1;min-width:60px">✅ Paid</div>
+            <div class="pay-opt"          id="hnOptT"  onclick="hnSelPay('ToPay')" style="flex:1;min-width:60px">⏳ ToPay</div>
+            <div class="pay-opt"          id="hnOptCr" onclick="hnSelPay('CreditPending')" style="flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;font-size:0.76rem">💳 Credit Pending</div>
+          </div>
+          <input type="hidden" id="hnPay" value="Paid">
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:10px">
+        <label class="form-lbl">Delivery Status</label>
+        <div class="pay-toggle">
+          <div class="pay-opt" id="hnOptPend" onclick="hnSelStatus('Pending')" style="border-color:#f59e0b;color:#f59e0b">🕐 Pending</div>
+          <div class="pay-opt sel-paid" id="hnOptDone" onclick="hnSelStatus('Delivered')">📬 Delivered</div>
+        </div>
+        <input type="hidden" id="hnStatus" value="Delivered">
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">Note</label>
+        <textarea id="hnNote" placeholder="Any special instructions…" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn-mc"  onclick="closeModal('histNewEntryModal')">Cancel</button>
+      <button class="btn-mok" onclick="saveHistNewEntry()">✅ Add Entry</button>
     </div>
   </div>
 </div>
@@ -1388,7 +1447,10 @@ function buildRows(ents, withAct) {
       <td style="font-size:0.7rem;color:var(--muted)">${h(e.vehicle)}</td>
       <td style="font-size:0.7rem">${h(e.item||'–')}</td>
       <td style="font-size:0.7rem">${h(e.bookedBy||'–')}</td>
-      <td><span class="tag ${e.payType==='Paid'?'tg-p':'tg-t'}" style="font-size:0.6rem">${e.payType}</span></td>
+      <td>
+        <span class="tag ${e.payType==='CreditPending'?'tg-credit':e.payType==='Paid'?'tg-p':'tg-t'}" style="font-size:0.59rem">${e.payType==='CreditPending'?'💳Credit':e.payType==='Paid'?'Paid':'ToPay'}</span>
+        <span class="tag ${(e.status||'Delivered')==='Pending'?'tg-pend':'tg-done'}" style="font-size:0.59rem;margin-top:2px;display:block">${(e.status||'Delivered')==='Pending'?'🕐Pending':'📬Done'}</span>
+      </td>
       <td class="r-am" style="text-align:right">₹${parseFloat(e.amount||0).toFixed(2)}</td>
       ${withAct?`<td><div class="act-btns"><button class="act-btn edit" onclick="histEditEnt(${oi})">✏️</button><button class="act-btn del" onclick="histDelEnt(${oi})">✕</button></div></td>`:''}
     </tr>`;
@@ -1574,6 +1636,83 @@ window.deleteHistSess = async idx => {
   } catch(e){ toast('Error: '+e.message,'error'); }
 };
 
+
+window.reopenSession = async () => {
+  if (!currentHistSess) return;
+  const s = currentHistSess;
+
+  // Check if there's already an active session today
+  try {
+    const snap = await db.doc('session/today').get();
+    if (snap.exists && snap.data().active) {
+      toast('Close today\'s active session first before reopening a past one.', 'error');
+      return;
+    }
+  } catch(e) { toast('Error: '+e.message,'error'); return; }
+
+  if (!confirm(
+    'Reopen session "' + s.date + '"?\n\n' +
+    'This will:\n' +
+    '• Restore all ' + (s.count||0) + ' entries to Today\'s Booking\n' +
+    '• Delete this session from the report history\n' +
+    '• Allow you to add/edit entries and close again\n\n' +
+    'Proceed?'
+  )) return;
+
+  try {
+    // 1. Restore session/today document
+    await db.doc('session/today').set({
+      active:    true,
+      startTime: s.startTime || new Date().toISOString(),
+      date:      s.date,
+      dateKey:   s.dateKey,
+      reopened:  true,
+      reopenedFrom: s.histId || s.dateKey
+    });
+
+    // 2. Re-add all entries to session/today/entries
+    const batch = db.batch();
+    (s.entries||[]).forEach(e => {
+      const ref = db.collection('session/today/entries').doc();
+      batch.set(ref, {
+        lr:        e.lr||'',
+        name:      e.name||'',
+        mobile:    e.mobile||'',
+        vehicle:   e.vehicle||'',
+        item:      e.item||'',
+        bookedBy:  e.bookedBy||'',
+        amount:    e.amount||0,
+        payType:   e.payType||'Paid',
+        note:      e.note||'',
+        status:    e.status||'Delivered',
+        creditPending: !!e.creditPending,
+        time:      e.time||'',
+        ts:        Date.now()
+      });
+    });
+    await batch.commit();
+
+    // 3. Delete from history
+    const docId = s.histId || s.dateKey;
+    await db.doc('history/'+docId).delete();
+
+    // 4. Remove from local array and update UI
+    const idx = histSessions.indexOf(s);
+    if (idx >= 0) histSessions.splice(idx, 1);
+
+    // 5. Also restore loadingCharges to input
+    const lc = s.loadingCharges || 0;
+    loadingCharges = lc;
+    const lcInput = document.getElementById('loadingChargesInput');
+    if (lcInput) lcInput.value = lc;
+
+    closeHistDet();
+    renderHistList();
+    switchTab('booking');
+    toast('Session reopened! You can now edit and re-close it. 🔓', 'success');
+  } catch(err) { toast('Error: '+err.message, 'error'); }
+};
+
 window.openHistDet = idx => {
   currentHistSess = histSessions[idx];
   refreshHistDet();
@@ -1589,8 +1728,9 @@ function refreshHistDet() {
   document.getElementById('histMeta').innerHTML  = `<span>📅 ${s.date}</span><span>📦 ${ents.length} Entries</span><span>⏰ Closed: ${ct}</span>`;
   document.getElementById('histBadge').innerHTML = `${ents.length}<br><span style="font-size:0.61rem;opacity:0.8">entries</span>`;
   const isAdmin = currentUser&&currentUser.role==='admin';
-  document.getElementById('adminBar').style.display  = isAdmin?'flex':'none';
-  document.getElementById('actTh').style.display     = isAdmin?'':'none';
+  document.getElementById('adminBar').style.display    = isAdmin?'flex':'none';
+  document.getElementById('actTh').style.display       = isAdmin?'':'none';
+  document.getElementById('btnReopenSess').style.display = isAdmin?'inline-block':'none';
   document.getElementById('histDetBody').innerHTML   = buildRows(ents,isAdmin);
   document.getElementById('histSumm').innerHTML      = summGrid(t);
   document.getElementById('histCalc').innerHTML      = calcBlk(t);
@@ -1598,6 +1738,84 @@ function refreshHistDet() {
 }
 
 window.closeHistDet = () => document.getElementById('histDetOverlay').classList.remove('show');
+
+// ── New Entry in closed history session (Admin only) ──
+window.openHistNewEntry = () => {
+  if (!currentHistSess) return;
+  // Reset form
+  ['hnLR','hnName','hnMobile','hnVehicle','hnAmt','hnNote'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('hnItem').value     = '';
+  document.getElementById('hnBookedBy').value = '';
+  hnSelPay('Paid');
+  hnSelStatus('Delivered');
+  // Fill bookedBy dropdown
+  const sel = document.getElementById('hnBookedBy');
+  sel.innerHTML = '<option value="">Select…</option>' +
+    bookedByNames.map(n=>`<option value="${h(n)}">${h(n)}</option>`).join('');
+  document.getElementById('histNewEntryModal').classList.add('show');
+};
+
+window.hnSelPay = type => {
+  document.getElementById('hnPay').value      = type;
+  document.getElementById('hnOptP').className  = 'pay-opt'+(type==='Paid'          ?' sel-paid':'');
+  document.getElementById('hnOptT').className  = 'pay-opt'+(type==='ToPay'         ?' sel-topay':'');
+  document.getElementById('hnOptCr').className = 'pay-opt'+(type==='CreditPending' ?' sel-topay':'');
+  const cr = document.getElementById('hnOptCr');
+  cr.style.cssText = type==='CreditPending'
+    ? 'flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;background:#fffbeb;font-size:0.76rem'
+    : 'flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;font-size:0.76rem';
+};
+
+window.hnSelStatus = type => {
+  document.getElementById('hnStatus').value     = type;
+  document.getElementById('hnOptPend').className = 'pay-opt'+(type==='Pending'  ?' sel-topay':'');
+  document.getElementById('hnOptDone').className = 'pay-opt'+(type==='Delivered'?' sel-paid':'');
+  if (type==='Pending') {
+    document.getElementById('hnOptPend').style.cssText = 'border-color:#f59e0b;color:#f59e0b;background:#fffbeb';
+    document.getElementById('hnOptDone').style.cssText = '';
+  } else {
+    document.getElementById('hnOptPend').style.cssText = 'border-color:#f59e0b;color:#f59e0b';
+    document.getElementById('hnOptDone').style.cssText = 'border-color:var(--green);color:var(--green);background:#f0fdf4';
+  }
+};
+
+window.saveHistNewEntry = async () => {
+  if (!currentHistSess) return;
+  const lr       = document.getElementById('hnLR').value.trim().toUpperCase();
+  const name     = document.getElementById('hnName').value.trim();
+  const mobile   = document.getElementById('hnMobile').value.trim();
+  const vehicle  = document.getElementById('hnVehicle').value.trim().toUpperCase();
+  const item     = document.getElementById('hnItem').value;
+  const bookedBy = document.getElementById('hnBookedBy').value;
+  const amount   = parseFloat(document.getElementById('hnAmt').value)||0;
+  const payType  = document.getElementById('hnPay').value;
+  const status   = document.getElementById('hnStatus').value||'Delivered';
+  const note     = document.getElementById('hnNote').value.trim();
+
+  if (!lr)           { toast('Enter LR No.','error'); return; }
+  if (!name)         { toast('Enter sender name','error'); return; }
+  if (!mobile || mobile.length < 10) { toast('Enter valid 10-digit mobile','error'); return; }
+  if (!vehicle)      { toast('Enter vehicle number','error'); return; }
+  if (!amount||amount<=0){ toast('Enter valid amount','error'); return; }
+
+  // Check for duplicate LR in this session
+  if ((currentHistSess.entries||[]).find(e=>e.lr===lr)) {
+    toast('LR No. already exists in this session!','error'); return;
+  }
+
+  const now = new Date();
+  const newEnt = {
+    lr, name, mobile, vehicle, item, bookedBy, amount, payType,
+    status, note, creditPending: payType==='CreditPending',
+    time: now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+  };
+
+  const ents = [...(currentHistSess.entries||[]), newEnt];
+  await saveHistFS(ents);
+  closeModal('histNewEntryModal');
+  toast('Entry added to session ✅','success');
+};
+
 
 // Admin: edit single entry in history
 window.histEditEnt = idx => {
