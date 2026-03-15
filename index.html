@@ -235,6 +235,45 @@ table.rtbl tr:nth-child(even){background:#fafbff}
 .hist-det-overlay.show{display:flex;align-items:flex-start;justify-content:center}
 .admin-bar{display:none;padding:8px 16px;background:#fff7ed;border-bottom:1px solid #fed7aa;font-size:0.73rem;color:#92400e;align-items:center;gap:8px}
 
+
+/* DELIVERY STATUS */
+.tg-pend{background:#fef9c3;color:#854d0e;border:1px solid #fde68a}
+.tg-credit{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.tg-done{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+
+/* SEARCH RESULTS */
+.srch-result-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:8px;transition:all 0.2s}
+.srch-result-card:hover{box-shadow:var(--shadow-md);border-color:#bfdbfe}
+.srch-entry-row{padding:11px 14px;border-bottom:1px solid #f0f4f8}
+.srch-entry-row:last-child{border-bottom:none}
+.srch-lr{font-weight:700;color:var(--accent);font-size:0.84rem}
+.srch-name{font-weight:600;font-size:0.84rem;color:var(--text)}
+.srch-meta{font-size:0.7rem;color:var(--muted);margin-top:3px;display:flex;flex-wrap:wrap;gap:6px}
+.srch-sess{font-size:0.64rem;background:#eff6ff;color:var(--accent);border:1px solid #bfdbfe;border-radius:5px;padding:2px 7px;margin-top:4px;display:inline-block}
+.srch-amt{font-weight:700;color:var(--green);font-size:0.92rem}
+.srch-amt.topay{color:#f97316}
+.srch-pending-badge{background:#fef9c3;color:#854d0e;border:1px solid #fde68a;border-radius:5px;padding:2px 7px;font-size:0.62rem;font-weight:600;margin-left:5px}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:10px}
+.search-wrap input{padding-left:34px;font-size:0.88rem}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:0.9rem;pointer-events:none}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:0.9rem;cursor:pointer;color:var(--muted);padding:2px 4px}
+/* HIST SUMMARY STRIP */
+.hist-summ-strip{background:linear-gradient(135deg,#1a56db,#0e3fa3);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;color:#fff;box-shadow:var(--shadow-md)}
+.hss-title{font-size:0.74rem;font-weight:600;opacity:0.8;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px}
+.hss-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.hss-item{background:rgba(255,255,255,0.14);border-radius:8px;padding:8px 10px;text-align:center}
+.hss-lbl{font-size:0.6rem;opacity:0.75;margin-bottom:2px;text-transform:uppercase;letter-spacing:0.4px}
+.hss-val{font-size:0.95rem;font-weight:700}
+/* POST-SAVE RECEIPT CARD */
+#postSaveCard{background:#fff;border:1.5px solid var(--green);border-radius:var(--radius);padding:13px 15px;margin-bottom:12px;box-shadow:var(--shadow);display:none}
+.psc-title{font-size:0.78rem;font-weight:700;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.psc-info{font-size:0.8rem;color:var(--text);font-weight:600;margin-bottom:10px;background:#f0fdf4;border-radius:6px;padding:7px 10px}
+.psc-btns{display:flex;gap:8px}
+.btn-psc-wa{flex:1;padding:10px;background:#25d366;border:none;color:#fff;border-radius:9px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+.btn-psc-pr{flex:1;padding:10px;background:#fff;border:1.5px solid var(--accent);color:var(--accent);border-radius:9px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+
 /* TOAST */
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);border-radius:24px;padding:9px 18px;font-size:0.78rem;font-weight:600;color:#fff;z-index:999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:var(--shadow-md)}
 .toast.show{transform:translateX(-50%) translateY(0)}
@@ -355,7 +394,7 @@ table.rtbl tr:nth-child(even){background:#fafbff}
           <select id="fItem">
             <option value="">Select item…</option>
             <option>Electronics</option><option>Clothing / Textile</option><option>Documents</option>
-            <option>Furniture</option><option>Auto Parts</option><option>Grocery / Food</option><option>Bike / Cycle</option>
+            <option>Furniture</option><option>Auto Parts</option><option>Grocery / Food</option>
             <option>Medicine / Medical</option><option>Machinery</option><option>Bags / Luggage</option><option>Other</option>
           </select>
         </div>
@@ -374,9 +413,10 @@ table.rtbl tr:nth-child(even){background:#fafbff}
         </div>
         <div class="form-row">
           <label class="form-lbl">Payment Type</label>
-          <div class="pay-toggle">
-            <div class="pay-opt sel-paid" id="optPaid"  onclick="selPay('Paid')">✅ Paid</div>
-            <div class="pay-opt"          id="optTopay" onclick="selPay('ToPay')">⏳ ToPay</div>
+          <div class="pay-toggle" style="flex-wrap:wrap;gap:4px">
+            <div class="pay-opt sel-paid" id="optPaid"   onclick="selPay('Paid')" style="flex:1;min-width:60px">✅ Paid</div>
+            <div class="pay-opt"          id="optTopay"  onclick="selPay('ToPay')" style="flex:1;min-width:60px">⏳ ToPay</div>
+            <div class="pay-opt"          id="optCredit" onclick="selPay('CreditPending')" style="flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;font-size:0.76rem">💳 Credit Pending</div>
           </div>
           <input type="hidden" id="fPayType" value="Paid">
         </div>
@@ -385,9 +425,27 @@ table.rtbl tr:nth-child(even){background:#fafbff}
         <label class="form-lbl">Note</label>
         <textarea id="fNote" placeholder="Any special instructions…" rows="2"></textarea>
       </div>
+      <div class="form-row">
+        <label class="form-lbl">Delivery Status</label>
+        <div class="pay-toggle">
+          <div class="pay-opt" id="optPend" onclick="selStatus('Pending')" style="border-color:#f59e0b;color:#f59e0b;background:#fffbeb">🕐 Pending</div>
+          <div class="pay-opt sel-paid" id="optDone" onclick="selStatus('Delivered')" style="">📬 Delivered</div>
+        </div>
+        <input type="hidden" id="fStatus" value="Delivered">
+      </div>
       <input type="hidden" id="fEditId" value="">
       <button class="btn-add" id="btnAdd" onclick="previewEntry()">👁 Review &amp; Add Entry</button>
       <button class="btn-cancel-edit" id="btnCancelEdit" onclick="cancelEdit()" style="display:none">✕ Cancel Edit</button>
+    </div>
+
+    <!-- POST-SAVE RECEIPT CARD -->
+    <div id="postSaveCard">
+      <div class="psc-title">✅ Entry Saved! Share receipt with customer:</div>
+      <div class="psc-info" id="postSaveInfo">–</div>
+      <div class="psc-btns">
+        <button class="btn-psc-wa" onclick="postSaveWA()">📲 WhatsApp Customer</button>
+        <button class="btn-psc-pr" onclick="postSavePrint()">🧾 Print Receipt</button>
+      </div>
     </div>
 
     <!-- ENTRIES LIST -->
@@ -399,7 +457,17 @@ table.rtbl tr:nth-child(even){background:#fafbff}
       <div class="filt-bar">
         <button class="fbtn fa" id="fAll"   onclick="setFilter('all')">All</button>
         <button class="fbtn"    id="fPaid"  onclick="setFilter('paid')">✅ Paid</button>
-        <button class="fbtn"    id="fTopay" onclick="setFilter('topay')">⏳ To Pay</button>
+        <button class="fbtn"    id="fTopay" onclick="setFilter('topay')">⏳ ToPay</button>
+        <button class="fbtn"    id="fPend"  onclick="setFilter('pending')">🕐 Pending</button>
+        <button class="fbtn"    id="fDone"   onclick="setFilter('delivered')">📬 Delivered</button>
+        <button class="fbtn"    id="fCredit" onclick="setFilter('credit')">💳 Credit</button>
+      </div>
+      <div style="padding:8px 12px;border-bottom:1px solid var(--border);background:#fafbff">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="entrySearch" placeholder="Search name, LR, mobile…" oninput="renderEntries()">
+          <button class="search-clear" onclick="document.getElementById('entrySearch').value='';renderEntries()">✕</button>
+        </div>
       </div>
       <div class="ent-wrap"><div id="entriesList"></div></div>
     </div>
@@ -429,8 +497,27 @@ table.rtbl tr:nth-child(even){background:#fafbff}
 <!-- HISTORY PAGE -->
 <div class="page" id="pageHistory">
   <div class="main">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div style="font-size:0.92rem;font-weight:700;color:var(--text)">📊 Last 30 Sessions</div>
+    <!-- Summary strip -->
+    <div class="hist-summ-strip" id="histSummStrip" style="display:none">
+      <div class="hss-title">📊 All Sessions Summary</div>
+      <div class="hss-grid">
+        <div class="hss-item"><div class="hss-lbl">Sessions</div><div class="hss-val" id="hssCount">0</div></div>
+        <div class="hss-item"><div class="hss-lbl">Gross Total</div><div class="hss-val" id="hssGross">₹0</div></div>
+        <div class="hss-item"><div class="hss-lbl">Commission</div><div class="hss-val" id="hssComm">₹0</div></div>
+      </div>
+      <div class="hss-grid" style="margin-top:6px;grid-template-columns:1fr 1fr">
+        <div class="hss-item"><div class="hss-lbl">Total Entries</div><div class="hss-val" id="hssEntries">0</div></div>
+        <div class="hss-item"><div class="hss-lbl">💳 Credit Pending</div><div class="hss-val" id="hssPending" style="color:#f59e0b">₹0</div></div>
+      </div>
+    </div>
+    <!-- Search -->
+    <div class="search-wrap" style="margin-bottom:10px">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="histSearch" placeholder="Search sessions by date, LR, name, mobile…" oninput="renderHistList()">
+      <button class="search-clear" onclick="document.getElementById('histSearch').value='';renderHistList()">✕</button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:0.88rem;font-weight:700;color:var(--text)">📋 Last 100 Sessions</div>
       <span style="font-size:0.69rem;color:var(--muted)">Tap a session to view</span>
     </div>
     <div id="histList"><div class="hist-empty"><div style="font-size:1.8rem;margin-bottom:8px">⏳</div>Loading…</div></div>
@@ -446,10 +533,7 @@ table.rtbl tr:nth-child(even){background:#fafbff}
     <div class="mbody">
       <div class="pvgrid" id="pvGrid"></div>
       <p style="font-size:0.72rem;color:var(--muted);text-align:center;margin-bottom:10px">Please verify all details before saving.</p>
-      <div class="pv-acts">
-        <button class="btn-wa-cust" onclick="sendToCustomerWA()">📲 WhatsApp to Customer</button>
-        <button class="btn-rcpt"    onclick="printReceipt()">🧾 Print Receipt</button>
-      </div>
+
     </div>
     <div class="mfoot">
       <button class="btn-mc"  onclick="closeModal('previewModal')">✏️ Edit</button>
@@ -590,7 +674,7 @@ table.rtbl tr:nth-child(even){background:#fafbff}
           <select id="heItem">
             <option value="">Select…</option>
             <option>Electronics</option><option>Clothing / Textile</option><option>Documents</option>
-            <option>Furniture</option><option>Auto Parts</option><option>Bike/Cycle</option>
+            <option>Furniture</option><option>Auto Parts</option><option>Grocery / Food</option>
             <option>Medicine / Medical</option><option>Machinery</option><option>Bags / Luggage</option><option>Other</option>
           </select>
         </div>
@@ -599,9 +683,10 @@ table.rtbl tr:nth-child(even){background:#fafbff}
       <div class="two-col" style="margin-bottom:10px">
         <div><label class="form-lbl">Amount (₹)</label><input type="number" id="heAmt" min="0"></div>
         <div><label class="form-lbl">Payment Type</label>
-          <div class="pay-toggle">
-            <div class="pay-opt sel-paid" id="heOptP" onclick="heSelPay('Paid')">✅ Paid</div>
-            <div class="pay-opt"          id="heOptT" onclick="heSelPay('ToPay')">⏳ ToPay</div>
+          <div class="pay-toggle" style="flex-wrap:wrap;gap:4px">
+            <div class="pay-opt sel-paid" id="heOptP"  onclick="heSelPay('Paid')" style="flex:1;min-width:60px">✅ Paid</div>
+            <div class="pay-opt"          id="heOptT"  onclick="heSelPay('ToPay')" style="flex:1;min-width:60px">⏳ ToPay</div>
+            <div class="pay-opt"          id="heOptCr" onclick="heSelPay('CreditPending')" style="flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;font-size:0.76rem">💳 Credit Pending</div>
           </div>
           <input type="hidden" id="hePay" value="Paid">
         </div>
@@ -648,6 +733,7 @@ let bookedByNames     = ['Rafi','Vignesh','Koyambedu office','Kilambakkam'];
 let unsubSess         = null;
 let unsubEntries      = null;
 let loadingCharges    = 0;   // manually entered per session
+let lastSavedEntry    = null; // for post-save receipt card
 
 // ══ BOOT ══════════════════════════════════════════════
 const savedAdmin = localStorage.getItem('pb_admin_v3');
@@ -898,7 +984,7 @@ window.doConfirmClose = async () => {
       entries:entries.map(e=>({
         lr:e.lr,name:e.name,mobile:e.mobile,vehicle:e.vehicle,
         amount:e.amount,payType:e.payType,time:e.time||'',
-        item:e.item||'',bookedBy:e.bookedBy||'',note:e.note||''
+        item:e.item||'',bookedBy:e.bookedBy||'',note:e.note||'',creditPending:!!e.creditPending,status:e.status||'Delivered'
       }))
     });
     const batch = db.batch();
@@ -910,11 +996,36 @@ window.doConfirmClose = async () => {
   } catch(e){ toast('Error: '+e.message,'error'); }
 };
 
+// ══ DELIVERY STATUS TOGGLE ════════════════════════════
+window.selStatus = type => {
+  document.getElementById('fStatus').value   = type;
+  document.getElementById('optPend').className = 'pay-opt'+(type==='Pending'  ?' sel-topay':'');
+  document.getElementById('optDone').className = 'pay-opt'+(type==='Delivered'?' sel-paid':'');
+  // override styles inline for yellow
+  if(type==='Pending'){
+    document.getElementById('optPend').style.cssText='border-color:#f59e0b;color:#f59e0b;background:#fffbeb';
+    document.getElementById('optDone').style.cssText='';
+  } else {
+    document.getElementById('optPend').style.cssText='';
+    document.getElementById('optDone').style.cssText='border-color:var(--green);color:var(--green);background:#f0fdf4';
+  }
+};
+// init delivered as default
+selStatus('Delivered');
+
 // ══ PAY TOGGLE ════════════════════════════════════════
 window.selPay = type => {
-  document.getElementById('fPayType').value    = type;
-  document.getElementById('optPaid').className  = 'pay-opt'+(type==='Paid' ?' sel-paid':'');
-  document.getElementById('optTopay').className = 'pay-opt'+(type==='ToPay'?' sel-topay':'');
+  document.getElementById('fPayType').value     = type;
+  document.getElementById('optPaid').className   = 'pay-opt'+(type==='Paid'          ?' sel-paid':'');
+  document.getElementById('optTopay').className  = 'pay-opt'+(type==='ToPay'         ?' sel-topay':'');
+  document.getElementById('optCredit').className = 'pay-opt'+(type==='CreditPending' ?' sel-topay':'');
+  // reset inline styles
+  const c = document.getElementById('optCredit');
+  if (type==='CreditPending') {
+    c.style.cssText='flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;background:#fffbeb;font-size:0.76rem';
+  } else {
+    c.style.cssText='flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;font-size:0.76rem';
+  }
 };
 
 // ══ ENTRY PREVIEW ═════════════════════════════════════
@@ -929,13 +1040,14 @@ window.previewEntry = () => {
   const amount   = parseFloat(document.getElementById('fAmount').value);
   const payType  = document.getElementById('fPayType').value;
   const note     = document.getElementById('fNote').value.trim();
+  const status   = document.getElementById('fStatus').value||'Delivered';
   const editId   = document.getElementById('fEditId').value;
   if (!lr)               { toast('Enter LR No.','error'); return; }
   if (!name)             { toast('Enter sender name','error'); return; }
   if (mobile.length<10)  { toast('Enter valid 10-digit mobile','error'); return; }
   if (!vehicle)          { toast('Enter vehicle number','error'); return; }
   if (!amount||amount<=0){ toast('Enter valid amount','error'); return; }
-  pendingEntry = {lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,editId};
+  pendingEntry = {lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status,editId};
   const pc = payType==='Paid'?'green':'orange';
   const pl = payType==='Paid'?'✅ Paid':'⏳ To Pay';
   document.getElementById('pvGrid').innerHTML =
@@ -947,14 +1059,20 @@ window.previewEntry = () => {
      <div class="pf"><div class="pf-l">Booked By</div><div class="pf-v">${h(bookedBy)||'–'}</div></div>
      <div class="pf"><div class="pf-l">Amount</div><div class="pf-v green">₹${amount.toFixed(2)}</div></div>
      <div class="pf"><div class="pf-l">Payment</div><div class="pf-v ${pc}">${pl}</div></div>
+     <div class="pf full"><div class="pf-l">Delivery Status</div><div class="pf-v" style="color:${pendingEntry.status==='Delivered'?'var(--green)':'#f59e0b'}">${pendingEntry.status==='Delivered'?'📬 Delivered':'🕐 Pending'}</div></div>
      ${note?`<div class="pf full"><div class="pf-l">Note</div><div class="pf-v" style="font-size:0.82rem;font-weight:500">${h(note)}</div></div>`:''}`;
   document.getElementById('previewModal').classList.add('show');
 };
 
-// Customer WhatsApp (from preview modal)
-window.sendToCustomerWA = () => {
-  if (!pendingEntry) return;
-  const d = pendingEntry;
+// ── Entry WA from table row ───────────────────────────
+window.sendEntryWAById = fid => {
+  const e = entries.find(x=>x._id===fid);
+  if (!e) return;
+  sendReceiptWA(e);
+};
+
+// Shared receipt WA sender
+function sendReceiptWA(d) {
   const msg =
     `🚚 *ANS Travels – Parcel Receipt*\n`+
     `━━━━━━━━━━━━━━━━━━━━━\n`+
@@ -965,20 +1083,19 @@ window.sendToCustomerWA = () => {
     `📦 *Item:* ${d.item||'–'}\n`+
     `👤 *Booked By:* ${d.bookedBy||'–'}\n`+
     `━━━━━━━━━━━━━━━━━━━━━\n`+
-    `💰 *Amount:* ₹${d.amount.toFixed(2)}\n`+
+    `💰 *Amount:* ₹${parseFloat(d.amount).toFixed(2)}\n`+
     `💳 *Payment:* ${d.payType==='Paid'?'✅ Paid':'⏳ To Pay'}\n`+
-    `${d.note?`📝 *Note:* ${d.note}\n`:''}`+
+    `🚚 *Delivery:* ${(d.status||'Delivered')==='Pending'?'🕐 Pending':'📬 Delivered'}\n`+
+    `${d.note?'📝 *Note:* '+d.note+'\n':''}`+
     `━━━━━━━━━━━━━━━━━━━━━\n`+
     `_Thank you for choosing ANS Travels!_\n`+
     `📅 ${new Date().toLocaleDateString('en-IN')}`;
-  const mob = d.mobile.replace(/\D/g,'');
+  const mob = (d.mobile||'').replace(/\D/g,'');
   window.open('https://wa.me/91'+mob+'?text='+encodeURIComponent(msg),'_blank');
-};
+}
 
-// Print receipt (from preview modal)
-window.printReceipt = () => {
-  if (!pendingEntry) return;
-  const d   = pendingEntry;
+// Shared print receipt
+function printSingleReceipt(d) {
   const now = new Date().toLocaleString('en-IN');
   document.getElementById('printArea').innerHTML = `
   <style>
@@ -988,9 +1105,12 @@ window.printReceipt = () => {
     .rh h2{font-size:16px;margin:0;font-family:Georgia,serif}.rh p{font-size:9px;margin:2px 0;color:#555}
     .rrow{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:10.5px}
     .rrow .rl{color:#666}.rrow .rv{font-weight:700;text-align:right;max-width:58%}
-    .rpay{text-align:center;margin:10px 0;padding:8px;border-radius:6px;font-weight:700;font-size:13px}
+    .rpay{text-align:center;margin:6px 0;padding:6px;border-radius:6px;font-weight:700;font-size:12px}
     .rp{background:#dcfce7;color:#166534;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .rt{background:#fff7ed;color:#c2410c;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .rst{text-align:center;margin:4px 0;padding:5px;border-radius:6px;font-weight:700;font-size:11px}
+    .rst-p{background:#fef9c3;color:#854d0e;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .rst-d{background:#dcfce7;color:#166534;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .ramt{text-align:center;font-size:18px;font-weight:700;margin:8px 0}
     .rft{text-align:center;margin-top:10px;font-size:9px;color:#888;border-top:2px dashed #ccc;padding-top:8px}
     .rlr{text-align:center;font-size:19px;font-weight:700;color:#1a56db;letter-spacing:1px;margin-bottom:4px}
@@ -1002,35 +1122,54 @@ window.printReceipt = () => {
   <div class="rrow"><span class="rl">Vehicle No.</span><span class="rv">${h(d.vehicle)}</span></div>
   <div class="rrow"><span class="rl">Item</span><span class="rv">${h(d.item||'–')}</span></div>
   <div class="rrow"><span class="rl">Booked By</span><span class="rv">${h(d.bookedBy||'–')}</span></div>
-  ${d.note?`<div class="rrow"><span class="rl">Note</span><span class="rv">${h(d.note)}</span></div>`:''}
-  <div class="ramt">₹${d.amount.toFixed(2)}</div>
+  ${d.note?'<div class="rrow"><span class="rl">Note</span><span class="rv">'+h(d.note)+'</span></div>':''}
+  <div class="ramt">₹${parseFloat(d.amount).toFixed(2)}</div>
   <div class="rpay ${d.payType==='Paid'?'rp':'rt'}">${d.payType==='Paid'?'✅ PAID':'⏳ TO PAY'}</div>
+  <div class="rst ${(d.status||'Delivered')==='Pending'?'rst-p':'rst-d'}">${(d.status||'Delivered')==='Pending'?'🕐 PENDING DELIVERY':'📬 DELIVERED'}</div>
   <div class="rft">Thank you for choosing ANS Travels!<br>Keep this receipt for reference.</div>`;
   window.print();
+}
+
+// Customer WhatsApp (from preview modal)
+window.sendToCustomerWA = () => {
+  if (!pendingEntry) return;
+  sendReceiptWA(pendingEntry);
+  return; /* legacy below unused */
+  
+};
+
+// Print receipt (from preview modal)
+window.printReceipt = () => {
+  if (!pendingEntry) return;
+  printSingleReceipt(pendingEntry);
+  return; /* legacy below unused */
+  
 };
 
 // ══ SUBMIT ENTRY ══════════════════════════════════════
 window.submitEntry = async () => {
   closeModal('previewModal');
   if (!pendingEntry) return;
-  const {lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,editId} = pendingEntry;
+  const {lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status,editId} = pendingEntry;
   const btn = document.getElementById('btnAdd');
   btn.disabled = true;
   try {
     if (editId) {
-      await db.doc('session/today/entries/'+editId).update({lr,name,mobile,vehicle,item,bookedBy,amount,payType,note});
+      await db.doc('session/today/entries/'+editId).update({lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status:status||'Delivered',creditPending:payType==='CreditPending'});
       toast('Entry updated ✅','success');
       cancelEdit();
     } else {
       if (entries.find(e=>e.lr===lr)){ toast('LR No. already exists!','error'); btn.disabled=false; return; }
       const now = new Date();
       await db.collection('session/today/entries').add({
-        lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,
+        lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status:status||'Delivered',
+        creditPending: payType==='CreditPending',
         ts:now.getTime(),
         time:now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
       });
       toast('Entry added ✅','success');
       clearForm();
+      showPostSaveCard({lr,name,mobile,vehicle,item,bookedBy,amount,payType,note,status:status||'Delivered'});
     }
   } catch(e){ toast('Error: '+e.message,'error'); }
   btn.disabled = false;
@@ -1050,6 +1189,7 @@ window.editEntry = fid => {
   document.getElementById('fNote').value     = e.note||'';
   document.getElementById('fEditId').value   = e._id;
   selPay(e.payType);
+  selStatus(e.status||'Delivered');
   document.getElementById('formTitle').textContent = '✏️ Edit Entry — '+e.lr;
   document.getElementById('btnAdd').textContent    = '👁 Review & Update';
   document.getElementById('btnAdd').className      = 'btn-add upd';
@@ -1064,6 +1204,7 @@ window.cancelEdit = () => {
   document.getElementById('btnAdd').className      = 'btn-add';
   document.getElementById('btnCancelEdit').style.display = 'none';
   clearForm();
+  selStatus('Delivered');
 };
 
 window.deleteEntry = async fid => {
@@ -1072,12 +1213,44 @@ window.deleteEntry = async fid => {
   catch(e){ toast('Error: '+e.message,'error'); }
 };
 
+window.markDelivered = async fid => {
+  const e = entries.find(x=>x._id===fid);
+  if (!e) return;
+  if (!confirm(`Mark "${e.name} (${e.lr})" as Delivered?`)) return;
+  try {
+    await db.doc('session/today/entries/'+fid).update({ status:'Delivered' });
+    toast('Marked as Delivered 📬','success');
+  } catch(err){ toast('Error: '+err.message,'error'); }
+};
+
 function clearForm() {
   ['fLR','fName','fMobile','fVehicle','fAmount','fNote'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fItem').value='';
   document.getElementById('fBookedBy').value='';
   selPay('Paid');
 }
+
+// ══ POST-SAVE RECEIPT CARD ════════════════════════════
+function showPostSaveCard(e) {
+  lastSavedEntry = e;
+  const payLbl = e.payType==='Paid'?'✅ Paid':'⏳ ToPay';
+  const stLbl  = e.status==='Delivered'?'📬 Delivered':'🕐 Pending';
+  document.getElementById('postSaveInfo').innerHTML =
+    `<strong>${h(e.lr)}</strong> | ${h(e.name)} | 📱 ${h(e.mobile)}<br>`+
+    `₹${parseFloat(e.amount).toFixed(2)} ${payLbl} | ${stLbl}`;
+  const card = document.getElementById('postSaveCard');
+  card.style.display = 'block';
+  card.scrollIntoView({behavior:'smooth', block:'nearest'});
+  setTimeout(()=>{ card.style.display='none'; }, 30000); // auto-hide after 30s
+}
+window.postSaveWA = () => {
+  if (!lastSavedEntry) return;
+  sendReceiptWA(lastSavedEntry);
+};
+window.postSavePrint = () => {
+  if (!lastSavedEntry) return;
+  printSingleReceipt(lastSavedEntry);
+};
 
 // ══ LOADING CHARGES ═══════════════════════════════════
 window.updateLoadingCharges = val => {
@@ -1091,9 +1264,12 @@ window.updateLoadingCharges = val => {
 // ══ FILTER ════════════════════════════════════════════
 window.setFilter = f => {
   currentFilter = f;
-  document.getElementById('fAll').className   = 'fbtn'+(f==='all'   ?' fa':'');
-  document.getElementById('fPaid').className  = 'fbtn'+(f==='paid'  ?' fp':'');
-  document.getElementById('fTopay').className = 'fbtn'+(f==='topay' ?' ft':'');
+  document.getElementById('fAll').className   = 'fbtn'+(f==='all'       ?' fa':'');
+  document.getElementById('fPaid').className  = 'fbtn'+(f==='paid'      ?' fp':'');
+  document.getElementById('fTopay').className = 'fbtn'+(f==='topay'     ?' ft':'');
+  document.getElementById('fPend').className   = 'fbtn'+(f==='pending'   ?' ft':'');
+  document.getElementById('fDone').className   = 'fbtn'+(f==='delivered' ?' fp':'');
+  document.getElementById('fCredit').className = 'fbtn'+(f==='credit'    ?' ft':'');
   renderEntries();
 };
 
@@ -1124,9 +1300,19 @@ function renderEntries() {
     list.innerHTML='<div class="empty-st"><div style="font-size:2rem;opacity:0.3;margin-bottom:7px">📋</div>No entries yet</div>';
     return;
   }
+  const q = (document.getElementById('entrySearch')?.value||'').trim().toLowerCase();
   let filt = [...entries];
-  if (currentFilter==='paid')  filt = entries.filter(e=>e.payType==='Paid');
-  if (currentFilter==='topay') filt = entries.filter(e=>e.payType==='ToPay');
+  if (currentFilter==='paid')      filt = filt.filter(e=>e.payType==='Paid');
+  if (currentFilter==='topay')     filt = filt.filter(e=>e.payType==='ToPay');
+  if (currentFilter==='pending')   filt = filt.filter(e=>e.status==='Pending');
+  if (currentFilter==='delivered') filt = filt.filter(e=>e.status==='Delivered'||!e.status);
+  if (currentFilter==='credit')    filt = filt.filter(e=>e.payType==='CreditPending');
+  if (q) filt = filt.filter(e=>
+    (e.lr||'').toLowerCase().includes(q)||
+    (e.name||'').toLowerCase().includes(q)||
+    (e.mobile||'').includes(q)||
+    (e.vehicle||'').toLowerCase().includes(q)
+  );
   if (!filt.length){
     list.innerHTML='<div class="empty-st"><div style="font-size:1.8rem;opacity:0.3;margin-bottom:7px">🔍</div>No entries for this filter</div>';
     return;
@@ -1140,9 +1326,14 @@ function renderEntries() {
       <td style="font-size:0.72rem">${h(e.vehicle)}</td>
       <td style="font-size:0.71rem">${h(e.item||'–')}</td>
       <td style="font-size:0.71rem">${h(e.bookedBy||'–')}</td>
-      <td><span class="tag ${e.payType==='Paid'?'tg-p':'tg-t'}">${e.payType==='Paid'?'Paid':'ToPay'}</span></td>
+      <td>
+        <span class="tag ${e.payType==='CreditPending'?'tg-credit':e.payType==='Paid'?'tg-p':'tg-t'}" style="font-size:0.63rem">${e.payType==='CreditPending'?'💳 Credit':e.payType==='Paid'?'Paid':'ToPay'}</span>
+        <span class="tag ${(e.status||'Delivered')==='Pending'?'tg-pend':'tg-done'}" style="margin-top:3px;display:block">${(e.status||'Delivered')==='Pending'?'🕐':'📬'}</span>
+      </td>
       <td style="font-weight:700;white-space:nowrap;font-size:0.82rem">₹${parseFloat(e.amount||0).toFixed(2)}</td>
       <td><div class="act-btns">
+        <button class="act-btn" onclick="sendEntryWAById('${e._id}')" title="WhatsApp" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534">📲</button>
+        ${(e.status||'Delivered')==='Pending'?`<button class="act-btn" onclick="markDelivered('${e._id}')" title="Mark Delivered" style="background:#fffbeb;border-color:#fcd34d;color:#92400e">📬</button>`:''}
         <button class="act-btn edit" onclick="editEntry('${e._id}')">✏️</button>
         ${isAdmin?`<button class="act-btn del" onclick="deleteEntry('${e._id}')">✕</button>`:''}
       </div></td>
@@ -1261,7 +1452,7 @@ async function loadHistory() {
   let sessions = [];
   try {
     // Try ordered query first (requires Firestore index)
-    const snap = await db.collection('history').orderBy('savedAt','desc').limit(30).get();
+    const snap = await db.collection('history').orderBy('savedAt','desc').limit(100).get();
     sessions = snap.docs.map(d=>d.data());
   } catch(e) {
     // Fallback: get all, sort client-side, take 30 most recent
@@ -1269,7 +1460,7 @@ async function loadHistory() {
       const snap2 = await db.collection('history').get();
       sessions = snap2.docs.map(d=>d.data())
         .sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))
-        .slice(0,30);
+        .slice(0,100);
     } catch(e2){ toast('Error: '+e2.message,'error'); return; }
   }
   histSessions = sessions;
@@ -1278,25 +1469,95 @@ async function loadHistory() {
 
 function renderHistList() {
   const el = document.getElementById('histList');
-  if (!histSessions.length){
+  // Update summary strip
+  if (histSessions.length) {
+    const strip = document.getElementById('histSummStrip');
+    strip.style.display = 'block';
+    const totGross   = histSessions.reduce((s,x)=>s+(x.gross||0),0);
+    const totComm    = histSessions.reduce((s,x)=>s+(x.commission||0),0);
+    const totEnts    = histSessions.reduce((s,x)=>s+(x.count||0),0);
+    const totPending = histSessions.reduce((sum,sx)=>sum+(sx.entries||[]).reduce((s2,e)=>s2+(e.creditPending?parseFloat(e.amount||0):0),0),0);
+    document.getElementById('hssCount').textContent   = histSessions.length;
+    document.getElementById('hssGross').textContent   = '₹'+Math.round(totGross).toLocaleString('en-IN');
+    document.getElementById('hssComm').textContent    = '₹'+Math.round(totComm).toLocaleString('en-IN');
+    document.getElementById('hssEntries').textContent = totEnts;
+    document.getElementById('hssPending').textContent = totPending>0?'₹'+Math.round(totPending).toLocaleString('en-IN'):'₹0';
+  }
+  // Search filter
+  const q = (document.getElementById('histSearch')?.value||'').trim().toLowerCase();
+
+  // When searching: show flat entry-level results directly
+  if (q) {
+    const matches = [];
+    histSessions.forEach((s, si) => {
+      (s.entries||[]).forEach(e => {
+        if (
+          (e.lr||'').toLowerCase().includes(q)||
+          (e.name||'').toLowerCase().includes(q)||
+          (e.mobile||'').includes(q)||
+          (e.vehicle||'').toLowerCase().includes(q)||
+          (s.date||'').toLowerCase().includes(q)||
+          (s.dateKey||'').includes(q)
+        ) matches.push({e, s, si});
+      });
+    });
+    if (!matches.length) {
+      el.innerHTML='<div class="hist-empty"><div style="font-size:1.8rem;margin-bottom:8px">🔍</div>No matching entries found</div>';
+      return;
+    }
+    el.innerHTML = `<div style="font-size:0.73rem;color:var(--muted);margin-bottom:8px">🔍 Found <strong>${matches.length}</strong> matching entr${matches.length===1?'y':'ies'}</div>`+
+      matches.map(({e,s,si})=>{
+        const payColor = e.payType==='Paid'?'green':'topay';
+        const pendBadge = e.creditPending?'<span class="srch-pending-badge">💳 Credit Pending</span>':'';
+        const stBadge = (e.status||'Delivered')==='Pending'?'<span class="tag tg-pend" style="font-size:0.6rem;margin-left:4px">🕐 Pending</span>':'';
+        return `<div class="srch-result-card">
+          <div class="srch-entry-row">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+              <div style="flex:1">
+                <span class="srch-lr">${h(e.lr||'–')}</span>
+                <span class="srch-name" style="margin-left:8px">${h(e.name)}</span>
+                ${pendBadge}${stBadge}
+                <div class="srch-meta">
+                  <span>📱 ${h(e.mobile)}</span>
+                  <span>🚛 ${h(e.vehicle)}</span>
+                  ${e.item?`<span>📦 ${h(e.item)}</span>`:''}
+                  ${e.bookedBy?`<span>👤 ${h(e.bookedBy)}</span>`:''}
+                </div>
+                <div class="srch-sess" onclick="openHistDet(${si})" style="cursor:pointer">📅 ${s.date} — tap to open session ›</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0">
+                <div class="srch-amt ${payColor}">₹${parseFloat(e.amount||0).toFixed(2)}</div>
+                <div style="font-size:0.68rem;color:var(--muted)">${e.payType==='Paid'?'✅ Paid':'⏳ ToPay'}</div>
+                ${e.time?`<div style="font-size:0.63rem;color:var(--muted)">${e.time}</div>`:''}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    return;
+  }
+
+  // No search — show session cards as usual
+  const filtered = histSessions;
+  if (!filtered.length){
     el.innerHTML='<div class="hist-empty"><div style="font-size:2rem;margin-bottom:8px">📊</div>No sessions found yet</div>';
     return;
   }
   const isAdmin = currentUser&&currentUser.role==='admin';
-  el.innerHTML = histSessions.map((s,i)=>`
+  el.innerHTML = filtered.map((s,i)=>`
     <div class="hist-card">
       <div class="hist-inner">
-        <div class="hist-l" onclick="openHistDet(${i})">
+        <div class="hist-l" onclick="openHistDet(${histSessions.indexOf(s)})">
           <div class="hist-dt">📅 ${s.date}</div>
           <div class="hist-mt">📦 ${s.count||0} entries &nbsp;|&nbsp; ✅ ₹${(s.paidAmt||0).toFixed(2)} &nbsp;|&nbsp; ⏳ ₹${(s.topayAmt||0).toFixed(2)}</div>
           <div class="hist-mt" style="font-size:0.66rem;margin-top:1px">⏰ ${s.closedAt?new Date(s.closedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'–'} &nbsp;|&nbsp; 💵 Cash: ₹${(s.cashBalance||(s.net-s.topayAmt)||0).toFixed(0)}${(s.loadingCharges||0)>0?' &nbsp;|&nbsp; 🏋️ LC: ₹'+(s.loadingCharges).toFixed(0):''}</div>
         </div>
-        <div class="hist-r" onclick="openHistDet(${i})">
-          <div class="hist-net">₹${(s.net||0).toFixed(2)}</div>
-          <div style="font-size:0.64rem;color:var(--muted)">Net</div>
+        <div class="hist-r" onclick="openHistDet(${histSessions.indexOf(s)})">
+          <div class="hist-net">₹${(s.gross||0).toFixed(2)}</div>
+          <div style="font-size:0.64rem;color:var(--muted)">Gross</div>
           <span class="hist-chv">›</span>
         </div>
-        ${isAdmin?`<button class="hist-del" onclick="deleteHistSess(${i})" title="Delete session">🗑️</button>`:''}
+        ${isAdmin?`<button class="hist-del" onclick="deleteHistSess(${histSessions.indexOf(s)})" title="Delete session">🗑️</button>`:''}
       </div>
     </div>`).join('');
 }
@@ -1355,9 +1616,14 @@ window.histEditEnt = idx => {
 };
 
 window.heSelPay = type => {
-  document.getElementById('hePay').value     = type;
-  document.getElementById('heOptP').className = 'pay-opt'+(type==='Paid' ?' sel-paid':'');
-  document.getElementById('heOptT').className = 'pay-opt'+(type==='ToPay'?' sel-topay':'');
+  document.getElementById('hePay').value      = type;
+  document.getElementById('heOptP').className  = 'pay-opt'+(type==='Paid'          ?' sel-paid':'');
+  document.getElementById('heOptT').className  = 'pay-opt'+(type==='ToPay'         ?' sel-topay':'');
+  document.getElementById('heOptCr').className = 'pay-opt'+(type==='CreditPending' ?' sel-topay':'');
+  const c = document.getElementById('heOptCr');
+  c.style.cssText = type==='CreditPending'
+    ?'flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;background:#fffbeb;font-size:0.76rem'
+    :'flex:1 1 100%;border-color:#f59e0b;color:#f59e0b;font-size:0.76rem';
 };
 
 window.saveHistEntry = async () => {
